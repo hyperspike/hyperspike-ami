@@ -4,14 +4,14 @@ CONMON_VERSION=$(shell cat VERSIONS|grep CONMON|sed -e 's/CONMON[\ \t]*=[\ \t]*/
 CRIO_VERSION=$(shell cat VERSIONS|grep CRIO|sed -e 's/CRIO[\ \t]*=[\ \t]*//' )
 CRUN_VERSION=$(shell cat VERSIONS|grep CRUN|sed -e 's/CRUN[\ \t]*=[\ \t]*//' )
 
-all: Dockerfile pkg/%/APKBUILD
+all: Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD
 	@if [ -d repo ] ; then \
 		docker build --build-arg signing_key=$(cat repo/*.rsa) --build-arg signing_pub=$(cat repo/*.rsa.pub) -t dan/alpine-repo:latest . ; \
 	else \
 		docker build -t dan/alpine-repo:latest . ; \
 	fi
-	docker ps -a |grep /repo/ && docker rm $$(docker ps -a | awk '$$NF ~ /repo/ {print $$1}') || true
-	docker create --name repo dan/alpine-repo
+	docker ps -a |grep alpine-repo && docker rm $$(docker ps -a | awk '$$NF ~ /alpine-repo/ {print $$1}') || true
+	docker create --name alpine-repo dan/alpine-repo
 	rm -rf ./repo
 	docker cp repo:/root/packages/pkg ./repo
 
