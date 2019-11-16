@@ -1,0 +1,24 @@
+# Maintainer: Dan Molik <dan@danmolik.com>
+pkgname=kubeadm
+pkgver=@K8S_VERSION@
+pkgrel=0
+pkgdesc="The Kubernetes 'deployment utility'"
+url="https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/"
+arch="x86_64"
+license="Apache-2.0"
+source="$pkgname"
+
+build() {
+	echo "skip"
+
+}
+
+check() {
+	echo "skip"
+}
+
+package() {
+	#cd "$builddir"
+	install -Dm755 $pkgname "$pkgdir"/usr/bin/$pkgname
+}
+

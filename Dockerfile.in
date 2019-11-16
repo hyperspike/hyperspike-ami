@@ -1,0 +1,98 @@
+FROM golang:1.12.13-alpine3.10 AS alpine-builder
+
+RUN apk update \
+	&& apk upgrade \
+	&& apk add rsync alpine-sdk binutils bash linux-headers libseccomp-dev glib-dev gpgme-dev libassuan-dev \
+	&& addgroup root abuild \
+	&& chgrp abuild /var/cache/distfiles \
+	&& chmod g+w /var/cache/distfiles
+
+FROM alpine-builder AS cri-o
+
+RUN cd $GOPATH \
+	&& mkdir -p src/github.com/cri-o/cri-o \
+	&& cd src/github.com/cri-o/cri-o \
+	&& curl -L https://github.com/cri-o/cri-o/archive/v@CRIO_VERSION@.tar.gz | tar xz --strip-components=1 -C . \
+	&& make \
+	&& make DESTDIR=/root/cri-o PREFIX=/root/cri-o/usr install install.config \
+	&& tar -cvzf /root/cri-o-@CRIO_VERSION@.tar.gz -C /root/cri-o . \
+	&& mkdir /build \
+	&& cp /root/cri-o-@CRIO_VERSION@.tar.gz /build
+
+FROM alpine-builder AS k8s
+
+RUN cd $GOPATH \
+	&& mkdir -p src/k8s.io/kubernetes \
+	&& cd src/k8s.io/kubernetes \
+	&& curl -L https://github.com/kubernetes/kubernetes/archive/v@K8S_VERSION@.tar.gz | tar xz --strip-components=1 -C . \
+	&& LDFLAGS="" make WHAT=cmd/kubelet GOFLAGS=-v \
+	&& LDFLAGS="" make WHAT=cmd/kubectl GOFLAGS=-v \
+	&& LDFLAGS="" make WHAT=cmd/kubeadm GOFLAGS=-v \
+	&& mkdir /build \
+	&& strip _output/bin/kubelet && cp _output/bin/kubelet /build \
+	&& strip _output/bin/kubectl && cp _output/bin/kubectl /build \
+	&& strip _output/bin/kubeadm && cp _output/bin/kubeadm /build
+
+FROM alpine-builder AS crun
+
+RUN mkdir -p /root/crun-src \
+	&& cd /root/crun-src \
+	&& apk add yajl-dev yajl libcap-dev argp-standalone \
+	&& curl -L https://github.com/containers/crun/releases/download/@CRUN_VERSION@/crun-@CRUN_VERSION@.tar.gz | tar xz --strip-components=1 -C . \
+	&& ./configure --prefix=/usr --disable-systemd --enable-bpf CFLAGS="-O2 -Wall -g -Wextra -pipe" \
+	&& cd libocispec \
+	&& make V=1 && make V=1 DESTDIR=/root/crun install-exec \
+	&& cd .. \
+	&& make V=1 crun && make V=1 DESTDIR=/root/crun install-exec \
+	&& tar -cvzf /root/crun-@CRUN_VERSION@.tar.gz -C /root/crun . \
+	&& mkdir /build \
+	&& cp /root/crun-@CRUN_VERSION@.tar.gz /build
+
+FROM alpine-builder AS conmon
+
+RUN mkdir -p /root/conmon-src \
+	&& cd /root/conmon-src \
+	&& curl -L https://github.com/containers/conmon/archive/v@CONMON_VERSION@.tar.gz | tar xz --strip-components=1 -C . \
+	&& make V=1 \
+	&& make DESTDIR=/root/conmon PREFIX=/usr install \
+	&& tar -cvzf /root/conmon-@CONMON_VERSION@.tar.gz -C /root/conmon . \
+	&& mkdir /build \
+	&& cp /root/conmon-@CONMON_VERSION@.tar.gz /build
+
+FROM alpine-builder AS packager
+
+ARG signing_key
+ARG signing_pub
+
+ENV SIGNING_KEY=$signing_key
+ENV SIGNING_PUB=$signing_pub
+
+COPY --from=k8s    /build/kubelet             /build/kubelet
+COPY --from=k8s    /build/kubectl             /build/kubectl
+COPY --from=k8s    /build/kubeadm             /build/kubeadm
+COPY --from=conmon /build/conmon-@CONMON_VERSION@.tar.gz /build/conmon-@CONMON_VERSION@.tar.gz
+COPY --from=cri-o  /build/cri-o-@CRIO_VERSION@.tar.gz /build/cri-o-@CRIO_VERSION@.tar.gz
+COPY --from=crun   /build/crun-@CRUN_VERSION@.tar.gz  /build/crun-@CRUN_VERSION@.tar.gz
+COPY ./pkg /pkg
+
+# libyajl was added because of weird breakage when abuild was readding crun for libs
+RUN if [ -z $SIGNING_KEY ] || [ -z $SIGNING_PUB ] ; then \
+		abuild-keygen -n  \
+		&& mv /root/.abuild/*.rsa     /root/.abuild/alpine-devel@danmolik.com.rsa \
+		&& mv /root/.abuild/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
+	else \
+		mkdir -p /root/.abuild/ \
+		&& echo $SIGNING_KEY > /root/.abuild/alpine-devel@danmolik.com.rsa \
+		&& echo $SIGNING_PUB > /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
+	fi \
+	&& echo "PACKAGER_PRIVKEY=\"/root/.abuild/alpine-devel@danmolik.com.rsa\"" > /root/.abuild/abuild.conf \
+	&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \
+	&& cd /pkg \
+	&& apk add tree yajl tree \
+	&& for p in conmon crun cri-o kubelet kubeadm kubectl ; do cd $p && mv /build/$p* . && echo "sha512sums=\"$(sha512sum ${p}*)\"" >> APKBUILD && abuild -FRk && abuild -F cleanoldpkg && cd ../ ; done \
+	; tree /pkg \
+	&& apk index -o /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/*.apk \
+	&& cp /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/APKINDEX.tar.gz \
+	&& abuild-sign -k /root/.abuild/*.rsa /root/packages/pkg/x86_64/APKINDEX.tar.gz \
+	&& cp /root/.abuild/*.rsa* /root/packages/pkg/
+
