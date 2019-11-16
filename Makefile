@@ -4,6 +4,10 @@ CONMON_VERSION=$(shell cat VERSIONS|grep CONMON|sed -e 's/CONMON[\ \t]*=[\ \t]*/
 CRIO_VERSION=$(shell cat VERSIONS|grep CRIO|sed -e 's/CRIO[\ \t]*=[\ \t]*//' )
 CRUN_VERSION=$(shell cat VERSIONS|grep CRUN|sed -e 's/CRUN[\ \t]*=[\ \t]*//' )
 
+default: all
+
+.PHONY: clean real-clean
+
 all: Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD
 	@if [ -d repo ] ; then \
 		docker build --build-arg signing_key=$(cat repo/*.rsa) --build-arg signing_pub=$(cat repo/*.rsa.pub) -t dan/alpine-repo:latest . ; \
@@ -34,3 +38,10 @@ pkg/%/APKBUILD: pkg/%/APKBUILD.in
 		-e "s/@CRUN_VERSION@/$(CRUN_VERSION)/g" \
 		-e "s/@CONMON_VERSION@/$(CONMON_VERSION)/g" \
 			$^ > $@
+
+
+clean:
+	rm -f pkg/*/APKBUILD Dockerfile
+
+real-clean: clean
+	rm -rf repo
