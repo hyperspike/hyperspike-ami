@@ -59,17 +59,22 @@ RUN mkdir -p /root/conmon-src \
 	&& mkdir /build \
 	&& cp /root/conmon-@CONMON_VERSION@.tar.gz /build
 
+FROM alpine-builder AS crictl
+
+RUN cd $GOPATH \
+	&& mkdir -p github.com/kubernetes-sigs/cri-tools \
+	&& cd github.com/kubernetes-sigs/cri-tools \
+	&& curl -L https://github.com/kubernetes-sigs/cri-tools/archive/v@CRICTL_VERSION@.tar.gz | tar xz --strip-components=1 -C . \
+	&& go build -mod=vendor -v -ldflags="-X github.com/kubernetes-sigs/cri-tools/pkg/version.Version=@CRICTL_VERSION@" -o bin/crictl ./cmd/crictl \
+	&& mkdir /build \
+	&& strip bin/crictl && cp bin/crictl /build
+
 FROM alpine-builder AS packager
-
-ARG signing_key
-ARG signing_pub
-
-ENV SIGNING_KEY=$signing_key
-ENV SIGNING_PUB=$signing_pub
 
 COPY --from=k8s    /build/kubelet             /build/kubelet
 COPY --from=k8s    /build/kubectl             /build/kubectl
 COPY --from=k8s    /build/kubeadm             /build/kubeadm
+COPY --from=crictl /build/crictl              /build/crictl
 COPY --from=conmon /build/conmon-@CONMON_VERSION@.tar.gz /build/conmon-@CONMON_VERSION@.tar.gz
 COPY --from=cri-o  /build/cri-o-@CRIO_VERSION@.tar.gz /build/cri-o-@CRIO_VERSION@.tar.gz
 COPY --from=crun   /build/crun-@CRUN_VERSION@.tar.gz  /build/crun-@CRUN_VERSION@.tar.gz
@@ -89,7 +94,7 @@ RUN if [ -z $SIGNING_KEY ] || [ -z $SIGNING_PUB ] ; then \
 	&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \
 	&& cd /pkg \
 	&& apk add tree yajl tree \
-	&& for p in conmon crun cri-o kubelet kubeadm kubectl ; do cd $p && mv /build/$p* . && echo "sha512sums=\"$(sha512sum ${p}*)\"" >> APKBUILD && abuild -FRk && abuild -F cleanoldpkg && cd ../ ; done \
+	&& for p in conmon crictl cri-o crun kubelet kubeadm kubectl ; do cd $p && mv /build/$p* . && echo "sha512sums=\"$(sha512sum ${p}*)\"" >> APKBUILD && abuild -FRk && abuild -F cleanoldpkg && cd ../ ; done \
 	; tree /pkg \
 	&& apk index -o /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/*.apk \
 	&& cp /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/APKINDEX.tar.gz \

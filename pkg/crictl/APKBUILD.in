@@ -1,0 +1,23 @@
+# Maintainer: Dan Molik <dan@danmolik.com>
+pkgname=crictl
+pkgver=@CRICTL_VERSION@
+pkgrel=0
+pkgdesc="CLI and validation tools for Kubelet Container Runtime Interface"
+url="https://github.com/kubernetes-sigs/cri-tools"
+arch="x86_64"
+license="Apache-2.0"
+source="$pkgname"
+
+build() {
+	echo "skip"
+
+}
+
+check() {
+	echo "skip"
+}
+
+package() {
+	install -Dm755 $pkgname "$pkgdir"/usr/bin/"$pkgname"
+}
+
