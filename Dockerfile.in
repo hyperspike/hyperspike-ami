@@ -71,6 +71,9 @@ RUN cd $GOPATH \
 
 FROM alpine-builder AS packager
 
+ARG SIGNING_KEY
+ARG SIGNING_PUB
+
 COPY --from=k8s    /build/kubelet             /build/kubelet
 COPY --from=k8s    /build/kubectl             /build/kubectl
 COPY --from=k8s    /build/kubeadm             /build/kubeadm
@@ -87,8 +90,8 @@ RUN if [ -z $SIGNING_KEY ] || [ -z $SIGNING_PUB ] ; then \
 		&& mv /root/.abuild/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
 	else \
 		mkdir -p /root/.abuild/ \
-		&& echo $SIGNING_KEY > /root/.abuild/alpine-devel@danmolik.com.rsa \
-		&& echo $SIGNING_PUB > /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
+		&& echo $SIGNING_KEY|base64 -d > /root/.abuild/alpine-devel@danmolik.com.rsa \
+		&& echo $SIGNING_PUB|base64 -d > /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
 	fi \
 	&& echo "PACKAGER_PRIVKEY=\"/root/.abuild/alpine-devel@danmolik.com.rsa\"" > /root/.abuild/abuild.conf \
 	&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \

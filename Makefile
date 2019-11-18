@@ -4,15 +4,16 @@ CONMON_VERSION=$(shell cat VERSIONS|grep CONMON|sed -e 's/CONMON[\ \t]*=[\ \t]*/
 CRIO_VERSION=$(shell cat VERSIONS|grep CRIO|sed -e 's/CRIO[\ \t]*=[\ \t]*//' )
 CRUN_VERSION=$(shell cat VERSIONS|grep CRUN|sed -e 's/CRUN[\ \t]*=[\ \t]*//' )
 CRICTL_VERSION=$(shell cat VERSIONS|grep CRICTL|sed -e 's/CRICTL[\ \t]*=[\ \t]*//' )
-SIGNING_KEY="$(shell if [ -d repo ] ; then cat repo/*.rsa ; fi)"
-SIGNING_PUB="$(shell if [ -d repo ] ; then cat repo/*.rsa.pub ; fi)"
+SIGNING_KEY="$(shell if [ -d repo ] ; then cat repo/*.rsa |base64 -w 0; fi)"
+SIGNING_PUB="$(shell if [ -d repo ] ; then cat repo/*.rsa.pub|base64 -w 0 ; fi)"
 
 default: all
 
 .PHONY: clean real-clean
 
+
 all: Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD
-	@if [ -d repo ] ; then \
+	if [ -d repo ] ; then \
 		echo "using existing keys" ; \
 		docker build --build-arg SIGNING_KEY --build-arg SIGNING_PUB -t dan/alpine-repo:latest . ; \
 	else \
