@@ -1,6 +1,7 @@
-FROM golang:1.12.13-alpine3.10 AS alpine-builder
+FROM golang:1.12.14-alpine3.10 AS alpine-builder
 
-RUN apk update \
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
+	&& apk update \
 	&& apk upgrade \
 	&& apk add rsync alpine-sdk binutils bash linux-headers libseccomp-dev glib-dev gpgme-dev libassuan-dev \
 	&& addgroup root abuild \
@@ -96,9 +97,15 @@ RUN if [ -z $SIGNING_KEY ] || [ -z $SIGNING_PUB ] ; then \
 	&& echo "PACKAGER_PRIVKEY=\"/root/.abuild/alpine-devel@danmolik.com.rsa\"" > /root/.abuild/abuild.conf \
 	&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \
 	&& cd /pkg \
-	&& apk add tree yajl tree \
+	&& apk add tree yajl \
+	&& git config --global user.email "alpine-devel@danmolik.com" \
+	&& git config --global user.name "Alpine Devel" \
+	&& git init . \
+	&& git add * \
+	&& git commit -a -m 'add all' \
+	&& cd linux && abuild -FRrk && abuild -F cleanoldpkg && cd ../ \
 	&& for p in conmon crictl cri-o crun kubelet kubeadm kubectl ; do cd $p && mv /build/$p* . && echo "sha512sums=\"$(sha512sum ${p}*)\"" >> APKBUILD && abuild -FRk && abuild -F cleanoldpkg && cd ../ ; done \
-	; tree /pkg \
+	; echo done \
 	&& apk index -o /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/*.apk \
 	&& cp /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/APKINDEX.tar.gz \
 	&& abuild-sign -k /root/.abuild/*.rsa /root/packages/pkg/x86_64/APKINDEX.tar.gz \

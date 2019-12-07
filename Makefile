@@ -4,6 +4,7 @@ CONMON_VERSION=$(shell cat VERSIONS|grep CONMON|sed -e 's/CONMON[\ \t]*=[\ \t]*/
 CRIO_VERSION=$(shell cat VERSIONS|grep CRIO|sed -e 's/CRIO[\ \t]*=[\ \t]*//' )
 CRUN_VERSION=$(shell cat VERSIONS|grep CRUN|sed -e 's/CRUN[\ \t]*=[\ \t]*//' )
 CRICTL_VERSION=$(shell cat VERSIONS|grep CRICTL|sed -e 's/CRICTL[\ \t]*=[\ \t]*//' )
+LINUX_VERSION=$(shell cat VERSIONS|grep LINUX|sed -e 's/LINUX[\ \t]*=[\ \t]*//' )
 SIGNING_KEY="$(shell if [ -d repo ] ; then cat repo/*.rsa |base64 -w 0; fi)"
 SIGNING_PUB="$(shell if [ -d repo ] ; then cat repo/*.rsa.pub|base64 -w 0 ; fi)"
 
@@ -12,10 +13,10 @@ default: all
 .PHONY: clean real-clean
 
 
-all: Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD
-	if [ -d repo ] ; then \
+all: Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux/APKBUILD
+	@if [ -d repo ] ; then \
 		echo "using existing keys" ; \
-		docker build --build-arg SIGNING_KEY --build-arg SIGNING_PUB -t dan/alpine-repo:latest . ; \
+		docker build --build-arg SIGNING_KEY=$(SIGNING_KEY) --build-arg SIGNING_PUB=$(SIGNING_PUB) -t dan/alpine-repo:latest . ; \
 	else \
 		docker build -t dan/alpine-repo:latest . ; \
 	fi
@@ -30,6 +31,7 @@ version:
 	@echo "Conmon:     ${CONMON_VERSION}"
 	@echo "Cri-o:      ${CRIO_VERSION}"
 	@echo "Crictl:     ${CRICTL_VERSION}"
+	@echo "Linux:      ${LINUX_VERSION}"
 
 Dockerfile: Dockerfile.in
 	sed -e "s/@CRIO_VERSION@/$(CRIO_VERSION)/g" \
@@ -37,6 +39,7 @@ Dockerfile: Dockerfile.in
 		-e "s/@CRUN_VERSION@/$(CRUN_VERSION)/g" \
 		-e "s/@CRICTL_VERSION@/$(CRICTL_VERSION)/g" \
 		-e "s/@CONMON_VERSION@/$(CONMON_VERSION)/g" \
+		-e "s/@LINUX_VERSION@/$(LINUX_VERSION)/g" \
 			$^ > $@
 
 pkg/%/APKBUILD: pkg/%/APKBUILD.in
@@ -45,6 +48,7 @@ pkg/%/APKBUILD: pkg/%/APKBUILD.in
 		-e "s/@CRUN_VERSION@/$(CRUN_VERSION)/g" \
 		-e "s/@CRICTL_VERSION@/$(CRICTL_VERSION)/g" \
 		-e "s/@CONMON_VERSION@/$(CONMON_VERSION)/g" \
+		-e "s/@LINUX_VERSION@/$(LINUX_VERSION)/g" \
 			$^ > $@
 
 
