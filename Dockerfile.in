@@ -1,4 +1,4 @@
-FROM golang:1.12.14-alpine3.10 AS alpine-builder
+FROM golang:1.13.5-alpine3.10 AS alpine-builder
 
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
 	&& apk update \

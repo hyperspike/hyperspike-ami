@@ -1,4 +1,4 @@
-KUBERNETES = 1.16.3
+KUBERNETES = 1.17.0
 CONMON     = 2.0.3
 CRUN       = 0.10.6
 CRIO       = 1.16.1
