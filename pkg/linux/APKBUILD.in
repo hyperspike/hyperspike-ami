@@ -1,6 +1,6 @@
 # Maintainer: Natanael Copa <ncopa@alpinelinux.org>
 
-pkgname=linux-virt
+pkgname=linux-hyperspike
 pkgver=@LINUX_VERSION@
 case $pkgver in
 	*.*.*)	_kernver=${pkgver%.*};;
@@ -17,7 +17,7 @@ makedepends="$_depends_dev sed installkernel bc linux-headers openssl-dev
 options="!strip"
 install=
 source="https://cdn.kernel.org/pub/linux/kernel/v${pkgver%%.*}.x/linux-$_kernver.tar.xz
-	config-virt.x86_64
+	config-hyperspike.x86_64
 	"
 subpackages="$pkgname-dev:_dev"
 
@@ -63,12 +63,12 @@ prepare() {
 }
 
 oldconfig() {
-	local _builddir="$srcdir"/build-virt.x86_64
+	local _builddir="$srcdir"/build-hyperspike.x86_64
 	mkdir -p "$_builddir"
-	echo "-$pkgrel-virt" > "$_builddir"/localversion-alpine \
+	echo "-$pkgrel-hyperspike" > "$_builddir"/localversion-alpine \
 		|| return 1
 
-	cp "$srcdir"/config-virt.x86_64 "$_builddir"/.config
+	cp "$srcdir"/config-hyperspike.x86_64 "$_builddir"/.config
 	make -C "$srcdir"/linux-$_kernver \
 		O="$_builddir" \
 		ARCH="x86_64" HOSTCC="$HOSTCC" \
@@ -78,16 +78,16 @@ oldconfig() {
 build() {
 	unset LDFLAGS
 	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
-	cd "$srcdir"/build-virt.x86_64
+	cd "$srcdir"/build-hyperspike.x86_64
 	make -j4 ARCH="x86_64" CC="${CC:-gcc}" \
-		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Alpine"
+		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Hyperspike"
 }
 
 package() {
-	local _abi_release=${pkgver}-${pkgrel}-virt
+	local _abi_release=${pkgver}-${pkgrel}-hyperspike
 	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
 
-	cd "$srcdir"/build-virt.x86_64
+	cd "$srcdir"/build-hyperspike.x86_64
 	# modules_install seems to regenerate a defect Modules.symvers on s390x. Work
 	# around it by backing it up and restore it after modules_install
 	cp Module.symvers Module.symvers.backup
@@ -162,5 +162,5 @@ _dev() {
 }
 
 sha512sums="9f60f77e8ab972b9438ac648bed17551c8491d6585a5e85f694b2eaa4c623fbc61eb18419b2656b6795eac5deec0edaa04547fc6723fbda52256bd7f3486898f  linux-5.4.tar.xz
-7d9477d075e4c94aca96eaa7c697a8a15c317160fc496a35bf255ad57f44989072d8933bd583a90509ac020998aa5199929d5445abdbe02888e5ec6a8a3c41c8  config-virt.x86_64
+7d9477d075e4c94aca96eaa7c697a8a15c317160fc496a35bf255ad57f44989072d8933bd583a90509ac020998aa5199929d5445abdbe02888e5ec6a8a3c41c8  config-hyperspike.x86_64
 aba07d75524ad33cd014700a1317c450fe4ea02817dc225848187fa2a353a215011d3ab485d1900796e0797b8c145bbbf10d706ab45784cc9413dbbc96889041  patch-5.4.2.xz"

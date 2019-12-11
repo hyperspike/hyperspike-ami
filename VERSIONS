@@ -4,3 +4,6 @@ CRUN       = 0.10.6
 CRIO       = 1.16.1
 CRICTL     = 1.16.1
 LINUX      = 5.4.2
+ALPINE     = 3.10.3
+
+HYPERSPIKE = 0.0.6

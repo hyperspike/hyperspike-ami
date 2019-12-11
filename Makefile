@@ -5,6 +5,8 @@ CRIO_VERSION=$(shell cat VERSIONS|grep CRIO|sed -e 's/CRIO[\ \t]*=[\ \t]*//' )
 CRUN_VERSION=$(shell cat VERSIONS|grep CRUN|sed -e 's/CRUN[\ \t]*=[\ \t]*//' )
 CRICTL_VERSION=$(shell cat VERSIONS|grep CRICTL|sed -e 's/CRICTL[\ \t]*=[\ \t]*//' )
 LINUX_VERSION=$(shell cat VERSIONS|grep LINUX|sed -e 's/LINUX[\ \t]*=[\ \t]*//' )
+ALPINE_VERSION=$(shell cat VERSIONS|grep ALPINE|sed -e 's/ALPINE[\ \t]*=[\ \t]*//' )
+HYPERSPIKE_VERSION=$(shell cat VERSIONS|grep HYPERSPIKE|sed -e 's/HYPERSPIKE[\ \t]*=[\ \t]*//' )
 SIGNING_KEY="$(shell if [ -d repo ] ; then cat repo/*.rsa |base64 -w 0; fi)"
 SIGNING_PUB="$(shell if [ -d repo ] ; then cat repo/*.rsa.pub|base64 -w 0 ; fi)"
 
@@ -24,6 +26,13 @@ all: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APK
 	docker create --name alpine-repo dan/alpine-repo
 	rm -rf ./repo
 	docker cp alpine-repo:/root/packages/pkg ./repo
+
+ami:
+	HYPERSPIKE_VERSION=$(HYPERSPIKE_VERSION) \
+		K8S_VERSION=$(K8S_VERSION) \
+		ALPINE_VERSION=$(ALPINE_VERSION) \
+		KERNEL_VERSION=$(LINUX_VERSION) \
+		packer build ami.json
 
 version:
 	@echo "Kubernetes: ${K8S_VERSION}"

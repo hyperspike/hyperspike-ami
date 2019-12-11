@@ -1,0 +1,92 @@
+{
+	"variables": {
+		"aws_access_key": "{{env `AWS_ACCESS_KEY_ID`}}",
+		"aws_secret_key": "{{env `AWS_SECRET_ACCESS_KEY`}}",
+		"region": "{{env `AWS_DEFAULT_REGION`}}",
+		"hyperspike": "{{env `HYPERSPIKE_VERSION`}}",
+		"kubernetes": "{{env `K8S_VERSION`}}",
+		"kernel": "{{env `KERNEL_VERSION`}}",
+		"alpine": "{{env `ALPINE_VERSION`}}"
+	},
+	"builders": [
+		{
+			"name": "hyperspike-us-east2",
+			"type": "amazon-ebs",
+			"access_key": "{{user `aws_access_key`}}",
+			"secret_key": "{{user `aws_secret_key`}}",
+			"region": "{{user `region`}}",
+			"source_ami": "ami-0110d80369eb75f49",
+			"instance_type": "t2.micro",
+			"ssh_username": "alpine",
+			"ami_name": "hyperspike-{{user `hyperspike`}}",
+			"ami_groups": [
+				"all"
+			],
+			"tags": {
+				"Name": "hyperspike-{{user `hyperspike`}}",
+				"Description": "A lightweight Alpine Linux based OS for Kubernetes",
+				"Kubernetes-Version": "{{user `kubernetes`}}",
+				"Alpine-Version": "{{user `alpine`}}",
+				"Kernel-Version": "{{user `kernel`}}"
+			},
+			"launch_block_device_mappings": [
+				{
+					"device_name": "/dev/xvda",
+					"volume_size": 3,
+					"volume_type": "gp2",
+					"delete_on_termination": true
+				}
+			],
+			"subnet_filter": {
+				"filters":{
+					"tag:Name":"packer"
+				}
+			}
+		},
+		{
+			"name": "hyperspike-us-east1",
+			"type": "amazon-ebs",
+			"access_key": "{{user `aws_access_key`}}",
+			"secret_key": "{{user `aws_secret_key`}}",
+			"region": "us-east-1",
+			"source_ami": "ami-063cb098a86c1c4cc",
+			"instance_type": "t2.micro",
+			"ssh_username": "alpine",
+			"ami_name": "hyperspike-{{user `hyperspike`}}",
+			"ami_groups": [
+				"all"
+			],
+			"tags": {
+				"Name": "hyperspike-{{user `hyperspike`}}",
+				"Description": "A lightweight Alpine Linux based OS for Kubernetes",
+				"Kubernetes-Version": "{{user `kubernetes`}}",
+				"Alpine-Version": "{{user `alpine`}}",
+				"Kernel-Version": "{{user `kernel`}}"
+			},
+			"launch_block_device_mappings": [
+				{
+					"device_name": "/dev/xvda",
+					"volume_size": 3,
+					"volume_type": "gp2",
+					"delete_on_termination": true
+				}
+			],
+			"subnet_filter": {
+				"filters":{
+					"tag:Name":"packer"
+				}
+			}
+		}
+	],
+	"provisioners": [
+		{
+			"type": "file",
+			"source": "scripts/",
+			"destination": "/tmp"
+		},
+		{
+			"type": "shell",
+			"script": "scripts/install-kubernetes.sh"
+		}
+	]
+}
