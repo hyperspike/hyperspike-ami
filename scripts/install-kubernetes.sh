@@ -22,7 +22,7 @@ sudo sed -i -e 's/^#\?\(rc_logger\)\=.*/\1\="YES"/' /etc/rc.conf
 sudo sed -i -e 's/^#\?\(rc_parallel\)\=.*/\1\="YES"/' /etc/rc.conf
 sudo rc-update add cgroups sysinit
 sudo rc-service cgroups start
-
+sudo su -c 'echo "bpffs                      /sys/fs/bpf             bpf     defaults 0 0" >> /etc/fstab'
 # sudo su -c 'echo "  ip link set dev eth0 mtu 9001" >> /etc/network/interfaces'
 sudo su -c 'echo br_netfilter >> /etc/modules'
 
@@ -60,7 +60,7 @@ sudo rm -rfv /var/tmp/*
 sudo rc-service crio start
 sudo rc-update add crio default
 sudo kubeadm config images pull
-sudo cat /var/log/crio/crio.log
+#sudo cat /var/log/crio/crio.log
 #sudo crictl -i /run/crio/crio.sock pull calico/cni:v3.9.1
 #sudo crictl -i /run/crio/crio.sock pull calico/node:v3.9.1
 #sudo crictl pull docker.io/cilium/operator:v1.6.4

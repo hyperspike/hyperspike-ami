@@ -106,7 +106,7 @@ package() {
 	rm -rf "$pkgdir"/lib/firmware
 
 	install -D include/config/kernel.release \
-		"$pkgdir"/usr/share/kernel/virt/kernel.release
+		"$pkgdir"/usr/share/kernel/hyperspike/kernel.release
 }
 
 _dev() {
@@ -162,5 +162,5 @@ _dev() {
 }
 
 sha512sums="9f60f77e8ab972b9438ac648bed17551c8491d6585a5e85f694b2eaa4c623fbc61eb18419b2656b6795eac5deec0edaa04547fc6723fbda52256bd7f3486898f  linux-5.4.tar.xz
-7d9477d075e4c94aca96eaa7c697a8a15c317160fc496a35bf255ad57f44989072d8933bd583a90509ac020998aa5199929d5445abdbe02888e5ec6a8a3c41c8  config-hyperspike.x86_64
+8fb138cd985d531a6a063c9d29d61c0f1e89d2b727f7912605271c8276a990b926ad7618673cc21272aa51c3dd4e00986923dcaccf99da215ce1718d42f96aea  config-hyperspike.x86_64
 aba07d75524ad33cd014700a1317c450fe4ea02817dc225848187fa2a353a215011d3ab485d1900796e0797b8c145bbbf10d706ab45784cc9413dbbc96889041  patch-5.4.2.xz"
