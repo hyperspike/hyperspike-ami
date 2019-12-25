@@ -6,7 +6,8 @@
 		"hyperspike": "{{env `HYPERSPIKE_VERSION`}}",
 		"kubernetes": "{{env `K8S_VERSION`}}",
 		"kernel": "{{env `KERNEL_VERSION`}}",
-		"alpine": "{{env `ALPINE_VERSION`}}"
+		"alpine": "{{env `ALPINE_VERSION`}}",
+		"cilium": "{{env `CILIUM_VERSION`}}"
 	},
 	"builders": [
 		{
@@ -15,10 +16,11 @@
 			"access_key": "{{user `aws_access_key`}}",
 			"secret_key": "{{user `aws_secret_key`}}",
 			"region": "{{user `region`}}",
-			"source_ami": "ami-0110d80369eb75f49",
+			"source_ami": "ami-01d8b7e276ad609aa",
 			"instance_type": "t2.micro",
 			"ssh_username": "alpine",
 			"ami_name": "hyperspike-{{user `hyperspike`}}",
+			"ami_description": "Hyperspike Kubernetes Linux {{user `hyperspike`}} - https://hyperspike.io",
 			"ami_groups": [
 				"all"
 			],
@@ -49,10 +51,11 @@
 			"access_key": "{{user `aws_access_key`}}",
 			"secret_key": "{{user `aws_secret_key`}}",
 			"region": "us-east-1",
-			"source_ami": "ami-063cb098a86c1c4cc",
+			"source_ami": "ami-00ee2daec698aab7c",
 			"instance_type": "t2.micro",
 			"ssh_username": "alpine",
 			"ami_name": "hyperspike-{{user `hyperspike`}}",
+			"ami_description": "Hyperspike Kubernetes Linux {{user `hyperspike`}} - https://hyperspike.io",
 			"ami_groups": [
 				"all"
 			],
@@ -85,6 +88,9 @@
 			"destination": "/tmp"
 		},
 		{
+			"environment_vars": [
+				"CILIUM_VERSION={{user `cilium`}}"
+			],
 			"type": "shell",
 			"script": "scripts/install-kubernetes.sh"
 		}

@@ -77,7 +77,7 @@ oldconfig() {
 
 build() {
 	unset LDFLAGS
-	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+	export KBUILD_BUILD_TIMESTAMP="$(LC_ALL=C date -d @${SOURCE_DATE_EPOCH})"
 	cd "$srcdir"/build-hyperspike.x86_64
 	make -j4 ARCH="x86_64" CC="${CC:-gcc}" \
 		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Hyperspike"
@@ -85,7 +85,7 @@ build() {
 
 package() {
 	local _abi_release=${pkgver}-${pkgrel}-hyperspike
-	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+	export KBUILD_BUILD_TIMESTAMP="$(LC_ALL=C date -d @${SOURCE_DATE_EPOCH})"
 
 	cd "$srcdir"/build-hyperspike.x86_64
 	# modules_install seems to regenerate a defect Modules.symvers on s390x. Work
@@ -122,7 +122,7 @@ _dev() {
 	pkgdesc="Headers and script for third party modules for $_flavor kernel"
 	depends="$_depends_dev"
 	local dir="$subpkgdir"/usr/src/linux-headers-${_abi_release}
-	export KBUILD_BUILD_TIMESTAMP="$(date -Ru${SOURCE_DATE_EPOCH:+d @$SOURCE_DATE_EPOCH})"
+	export KBUILD_BUILD_TIMESTAMP="$(LC_ALL=C date -d @${SOURCE_DATE_EPOCH})"
 
 	# first we import config, run prepare to set up for building
 	# external modules, and create the scripts
@@ -163,4 +163,4 @@ _dev() {
 
 sha512sums="9f60f77e8ab972b9438ac648bed17551c8491d6585a5e85f694b2eaa4c623fbc61eb18419b2656b6795eac5deec0edaa04547fc6723fbda52256bd7f3486898f  linux-5.4.tar.xz
 8fb138cd985d531a6a063c9d29d61c0f1e89d2b727f7912605271c8276a990b926ad7618673cc21272aa51c3dd4e00986923dcaccf99da215ce1718d42f96aea  config-hyperspike.x86_64
-aba07d75524ad33cd014700a1317c450fe4ea02817dc225848187fa2a353a215011d3ab485d1900796e0797b8c145bbbf10d706ab45784cc9413dbbc96889041  patch-5.4.2.xz"
+6f6d73c7ce71d47e810847149f4c258f5fb99c98fc67d385a3ff74889543a415bf8bb77c748a13f72b733bca770773731d84713a9be98d630b7377a792f11f5a  patch-5.4.6.xz"

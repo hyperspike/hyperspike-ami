@@ -3,6 +3,8 @@
 sudo su -c 'echo http://dl-cdn.alpinelinux.org/alpine/edge/main/ >> /etc/apk/repositories'
 sudo su -c 'echo https://danmolik.com/alpine/ >> /etc/apk/repositories'
 sudo su -c 'wget https://danmolik.com/alpine/alpine-devel@danmolik.com.rsa.pub -P /etc/apk/keys'
+sudo modprobe overlay
+sudo modprobe ext4
 sudo apk update
 sudo apk del linux-virt
 sudo apk --no-cache add linux-hyperspike
@@ -25,7 +27,7 @@ sudo rc-service cgroups start
 sudo su -c 'echo "bpffs                      /sys/fs/bpf             bpf     defaults 0 0" >> /etc/fstab'
 # sudo su -c 'echo "  ip link set dev eth0 mtu 9001" >> /etc/network/interfaces'
 sudo su -c 'echo br_netfilter >> /etc/modules'
-
+sudo su -c 'echo -e "NAME=Hyperspike\nID=hyperspike\nPRETTY_NAME=\"Hyperspike/Linux\"\nANSI_COLOR=\"0;35\"\nHOME_URL=\"https://hyperspike.io\"\nSUPPORT_URL=\"https://www.hyperspike.io/support\"\nBUG_REPORT_URL=\"https://bugs.hyperspike.io/\"" > /etc/os-release'
 sudo su -c 'echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf'
 sudo su -c 'echo "net.ipv4.ip_local_port_range=1024 65000" >> /etc/sysctl.conf'
 sudo su -c 'echo "net.ipv4.tcp_tw_reuse=1" >> /etc/sysctl.conf'
@@ -51,7 +53,7 @@ sudo su -c 'echo "net.ipv4.neigh.default.gc_thresh3=16384" >> /etc/sysctl.conf'
 
 sudo mkdir -p /etc/cni/net.d
 sudo mkdir -p /opt/cni/bin
-sudo su -c 'echo "runtime-endpoint: unix:///var/run/crio/crio.sock" >> /etc/crictl.yaml'
+sudo su -c 'echo "runtime-endpoint: unix:///run/crio/crio.sock" >> /etc/crictl.yaml'
 sudo cp /tmp/crio.conf /etc/crio/crio.conf
 sudo mkdir /etc/containers
 sudo cp /tmp/policy.json /etc/containers
@@ -59,18 +61,18 @@ sudo rm -rfv /tmp/*
 sudo rm -rfv /var/tmp/*
 sudo rc-service crio start
 sudo rc-update add crio default
+sleep 5
+sudo rc-service crio restart
 sudo kubeadm config images pull
-#sudo cat /var/log/crio/crio.log
-#sudo crictl -i /run/crio/crio.sock pull calico/cni:v3.9.1
-#sudo crictl -i /run/crio/crio.sock pull calico/node:v3.9.1
-#sudo crictl pull docker.io/cilium/operator:v1.6.4
-sudo crictl pull docker.io/cilium/cilium:v1.6.4
-#sudo crictl -i /run/containerd/containerd.sock pull gcr.io/google-containers/startup-script:v1
+sudo cat /var/log/crio/crio.log
+# sudo crictl pull docker.io/cilium/operator:v1.6.4
+sudo crictl pull docker.io/cilium/cilium:v${CILIUM_VERSION}
+# sudo crictl -i /run/containerd/containerd.sock pull gcr.io/google-containers/startup-script:v1
 
 sudo rc-update add kubelet default
 #df -h
 #sudo su -c 'find / -maxdepth 1 -mindepth 1 -type d | xargs du -sh'
 #sudo su -c 'find /usr -maxdepth 1 -mindepth 1 -type d | xargs du -sh'
 #sudo su -c 'find /usr/bin -maxdepth 1 -mindepth 1 -type d | xargs du -sh'
-#ls -lhSr /usr/bin
+
 sudo rm /var/lib/cloud/.bootstrap-complete
