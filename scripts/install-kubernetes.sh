@@ -12,7 +12,7 @@ sudo apk --no-cache add util-linux conmon
 sudo apk --no-cache add socat ethtool ipvsadm iproute2 iptables ebtables
 sudo apk --no-cache upgrade
 
-sudo apk --no-cache add kubectl kubeadm kubelet cri-o crun crictl ca-certificates ipset
+sudo apk --no-cache add kubectl kubeadm kubelet cri-o crun crictl ca-certificates ipset conntrack-tools
 sudo rm -rf /var/cache/apk/*
 #sudo mount -t tmpfs cgroup_root /sys/fs/cgroup
 #for d in cpuset memory cpu cpuacct blkio devices freezer net_cls perf_event net_prio hugetlb pids; do
