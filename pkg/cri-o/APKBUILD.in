@@ -23,8 +23,8 @@ package() {
 	cd "$srcdir"
 	install -Dm644 etc/crictl.yaml            "$pkgdir"/etc/crictl.yaml
 	install -Dm644 etc/crio/crio.conf         "$pkgdir"/etc/crio/crio.conf
-	install -dm755 usr/bin/crio               "$pkgdir"/usr/bin/crio
-	install -dm755 usr/bin/pinns              "$pkgdir"/usr/bin/pinns
+	install -Dm755 usr/bin/crio               "$pkgdir"/usr/bin/crio
+	install -Dm755 usr/bin/pinns              "$pkgdir"/usr/bin/pinns
 	install -Dm755 usr/bin/crio-status        "$pkgdir"/usr/bin/crio-status
 	# install -Dm755 usr/libexec/crio/pause     "$pkgdir"/usr/libexec/crio/pause
 	install -Ddm755 "$pkgdir"/usr/share/containers/oci/hooks.d/
