@@ -1,6 +1,7 @@
 #!/bin/sh
 
 sudo su -c 'echo http://dl-cdn.alpinelinux.org/alpine/edge/main/ >> /etc/apk/repositories'
+sudo su -c 'echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories'
 sudo su -c 'echo https://danmolik.com/alpine/ >> /etc/apk/repositories'
 sudo su -c 'wget https://danmolik.com/alpine/alpine-devel@danmolik.com.rsa.pub -P /etc/apk/keys'
 sudo modprobe overlay
