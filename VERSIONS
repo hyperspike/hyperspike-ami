@@ -1,11 +1,11 @@
-KUBERNETES = 1.18.0
+KUBERNETES = 1.18.1
 CONMON     = 2.0.14
 CRUN       = 0.13
-CRIO       = 1.17.2
+CRIO       = 1.17.3
 CRICTL     = 1.18.0
-LINUX      = 5.6.2
+LINUX      = 5.6.3
 ALPINE     = 3.11.5
 GO         = 1.14.1
 CILIUM     = 1.7.2
 
-HYPERSPIKE = 0.2.10
+HYPERSPIKE = 0.2.11

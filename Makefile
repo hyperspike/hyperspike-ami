@@ -67,7 +67,6 @@ pkg/%/APKBUILD: pkg/%/APKBUILD.in
 		-e "s/@LINUX_VERSION@/$(LINUX_VERSION)/g" \
 			$^ > $@
 
-
 clean:
 	rm -f pkg/*/APKBUILD Dockerfile
 
