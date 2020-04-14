@@ -8,3 +8,6 @@ If you don't want to host the packages yourself you can use my repo at `https://
     echo https://danmolik.com/alpine/ >> /etc/apk/repositories
 
 AMIs are available in us-east 1 and 2. Simply search for hyperspike.
+
+    us-east-1: ami-0b2e39b6987342b5d
+    us-east-2: ami-0c798e258b5ccb3df
