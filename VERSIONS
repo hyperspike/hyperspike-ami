@@ -1,4 +1,4 @@
-KUBERNETES = 1.18.1
+KUBERNETES = 1.18.2
 CONMON     = 2.0.14
 CRUN       = 0.13
 CRIO       = 1.17.3
@@ -8,4 +8,4 @@ ALPINE     = 3.11.5
 GO         = 1.14.2
 CILIUM     = 1.7.2
 
-HYPERSPIKE = 0.2.12
+HYPERSPIKE = 0.2.13

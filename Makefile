@@ -47,7 +47,7 @@ version:
 	@echo "Go:         ${GO_VERSION}"
 	@echo "Linux:      ${LINUX_VERSION}"
 
-Dockerfile: Dockerfile.in
+Dockerfile: Dockerfile.in VERSIONS
 	sed -e "s/@CRIO_VERSION@/$(CRIO_VERSION)/g" \
 		-e "s/@GO_VERSION@/$(GO_VERSION)/g" \
 		-e "s/@K8S_VERSION@/$(K8S_VERSION)/g" \
@@ -57,7 +57,7 @@ Dockerfile: Dockerfile.in
 		-e "s/@LINUX_VERSION@/$(LINUX_VERSION)/g" \
 			$^ > $@
 
-pkg/%/APKBUILD: pkg/%/APKBUILD.in
+pkg/%/APKBUILD: pkg/%/APKBUILD.in VERSIONS
 	sed -e "s/@CRIO_VERSION@/$(CRIO_VERSION)/g" \
 		-e "s/@GO_VERSION@/$(GO_VERSION)/g" \
 		-e "s/@K8S_VERSION@/$(K8S_VERSION)/g" \
