@@ -18,7 +18,7 @@ default: all
 
 all: pkgs ami
 
-pkgs: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux/APKBUILD
+pkgs: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux/APKBUILD pkg/aws-irsa/APKBUILD
 	@if [ -d repo ] ; then \
 		echo "using existing keys" ; \
 		docker build --build-arg SIGNING_KEY=$(SIGNING_KEY) --build-arg SIGNING_PUB=$(SIGNING_PUB) -t dan/alpine-repo:latest . ; \
@@ -47,6 +47,11 @@ version:
 	@echo "Go:         ${GO_VERSION}"
 	@echo "Linux:      ${LINUX_VERSION}"
 
+c := conmon-2.0.14-r0.apk
+
+t:
+	@echo $(c)
+
 Dockerfile: Dockerfile.in VERSIONS
 	sed -e "s/@CRIO_VERSION@/$(CRIO_VERSION)/g" \
 		-e "s/@GO_VERSION@/$(GO_VERSION)/g" \
@@ -55,7 +60,7 @@ Dockerfile: Dockerfile.in VERSIONS
 		-e "s/@CRICTL_VERSION@/$(CRICTL_VERSION)/g" \
 		-e "s/@CONMON_VERSION@/$(CONMON_VERSION)/g" \
 		-e "s/@LINUX_VERSION@/$(LINUX_VERSION)/g" \
-			$^ > $@
+			$< > $@
 
 pkg/%/APKBUILD: pkg/%/APKBUILD.in VERSIONS
 	sed -e "s/@CRIO_VERSION@/$(CRIO_VERSION)/g" \
@@ -65,7 +70,7 @@ pkg/%/APKBUILD: pkg/%/APKBUILD.in VERSIONS
 		-e "s/@CRICTL_VERSION@/$(CRICTL_VERSION)/g" \
 		-e "s/@CONMON_VERSION@/$(CONMON_VERSION)/g" \
 		-e "s/@LINUX_VERSION@/$(LINUX_VERSION)/g" \
-			$^ > $@
+			$< > $@
 
 clean:
 	rm -f pkg/*/APKBUILD Dockerfile

@@ -14,7 +14,7 @@ start_stop_daemon_args=" \
 	--stderr /var/log/kubelet/${RC_SVCNAME}.log"
 supervisor=supervise-daemon
 respawn_max=9999
-respawn_delay=3
+respawn_delay=10
 
 depend() {
 	after net

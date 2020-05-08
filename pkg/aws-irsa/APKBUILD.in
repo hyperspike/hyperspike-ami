@@ -1,0 +1,23 @@
+# Maintainer: Dan Molik <dan@danmolik.com>
+pkgname=aws-irsa
+pkgver=0.0.1
+pkgrel=0
+pkgdesc="Amazon EKS Pod Identity Webhook"
+url="https://github.com/aws/amazon-eks-pod-identity-webhook/"
+arch="x86_64"
+license="Apache-2.0"
+source="$pkgname"
+
+build() {
+	echo "skip"
+}
+
+check() {
+	echo "skip"
+}
+
+package() {
+	cd "$srcdir"
+	install -Dm755 "$pkgname" "$pkgdir"/usr/bin/"$pkgname"
+}
+

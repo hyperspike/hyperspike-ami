@@ -10,6 +10,15 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositori
 	&& chgrp abuild /var/cache/distfiles \
 	&& chmod g+w /var/cache/distfiles
 
+FROM alpine-builder AS aws-irsa
+
+	RUN mkdir -p src/github.com/aws/amazon-eks-pod-identity-webhook \
+	&& cd src/github.com/aws/amazon-eks-pod-identity-webhook \
+	&& curl -L https://github.com/aws/amazon-eks-pod-identity-webhook/archive/master.tar.gz | tar xz --strip-components=1 -C . \
+	&& go build -v -o aws-irsa hack/self-hosted/main.go \
+	&& mkdir /build \
+	&& cp aws-irsa /build
+
 FROM alpine-builder AS cri-o
 
 RUN cd $GOPATH \
@@ -77,13 +86,14 @@ FROM alpine-builder AS packager
 ARG SIGNING_KEY
 ARG SIGNING_PUB
 
-COPY --from=k8s    /build/kubelet             /build/kubelet
-COPY --from=k8s    /build/kubectl             /build/kubectl
-COPY --from=k8s    /build/kubeadm             /build/kubeadm
-COPY --from=crictl /build/crictl              /build/crictl
-COPY --from=conmon /build/conmon-@CONMON_VERSION@.tar.gz /build/conmon-@CONMON_VERSION@.tar.gz
-COPY --from=cri-o  /build/cri-o-@CRIO_VERSION@.tar.gz /build/cri-o-@CRIO_VERSION@.tar.gz
-COPY --from=crun   /build/crun-@CRUN_VERSION@.tar.gz  /build/crun-@CRUN_VERSION@.tar.gz
+COPY --from=k8s      /build/kubelet             /build/kubelet
+COPY --from=k8s      /build/kubectl             /build/kubectl
+COPY --from=k8s      /build/kubeadm             /build/kubeadm
+COPY --from=crictl   /build/crictl              /build/crictl
+COPY --from=aws-irsa /build/aws-irsa            /build/aws-irsa
+COPY --from=conmon   /build/conmon-@CONMON_VERSION@.tar.gz /build/conmon-@CONMON_VERSION@.tar.gz
+COPY --from=cri-o    /build/cri-o-@CRIO_VERSION@.tar.gz /build/cri-o-@CRIO_VERSION@.tar.gz
+COPY --from=crun     /build/crun-@CRUN_VERSION@.tar.gz  /build/crun-@CRUN_VERSION@.tar.gz
 COPY ./pkg /pkg
 
 # libyajl was added because of weird breakage when abuild was readding crun for libs
@@ -106,7 +116,7 @@ RUN if [ -z $SIGNING_KEY ] || [ -z $SIGNING_PUB ] ; then \
 	&& git add * \
 	&& git commit -a -m 'add all' \
 	&& cd linux && abuild -FRrk && abuild -F cleanoldpkg && cd ../ \
-	&& for p in conmon crictl cri-o crun kubelet kubeadm kubectl ; do cd $p && mv /build/$p* . && echo "sha512sums=\"$(sha512sum ${p}*)\"" >> APKBUILD && abuild -FRk && abuild -F cleanoldpkg && cd ../ ; done \
+	&& for p in aws-irsa conmon crictl cri-o crun kubelet kubeadm kubectl ; do cd $p && mv /build/$p* . && echo "sha512sums=\"$(sha512sum ${p}*)\"" >> APKBUILD && abuild -FRk && abuild -F cleanoldpkg && cd ../ ; done \
 	; echo done \
 	&& apk index -o /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/*.apk \
 	&& cp /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/APKINDEX.tar.gz \

@@ -13,7 +13,7 @@ sudo apk --no-cache add util-linux conmon
 sudo apk --no-cache add socat ethtool ipvsadm iproute2 iptables ebtables
 sudo apk --no-cache upgrade
 
-sudo apk --no-cache add kubectl kubeadm kubelet cri-o crun crictl ca-certificates ipset conntrack-tools
+sudo apk --no-cache add kubectl kubeadm kubelet cri-o crun crictl ca-certificates ipset conntrack-tools openssl jq aws-irsa
 sudo rm -rf /var/cache/apk/*
 #sudo mount -t tmpfs cgroup_root /sys/fs/cgroup
 #for d in cpuset memory cpu cpuacct blkio devices freezer net_cls perf_event net_prio hugetlb pids; do
@@ -25,7 +25,7 @@ sudo sed -i -e 's/^#\?\(rc_logger\)\=.*/\1\="YES"/' /etc/rc.conf
 sudo sed -i -e 's/^#\?\(rc_parallel\)\=.*/\1\="YES"/' /etc/rc.conf
 sudo rc-update add cgroups sysinit
 sudo rc-service cgroups start
-sudo su -c 'echo "bpffs                      /sys/fs/bpf             bpf     defaults 0 0" >> /etc/fstab'
+sudo su -c 'echo "bpffs       /sys/fs/bpf    bpf      defaults,shared     0 0" >> /etc/fstab'
 # sudo su -c 'echo "  ip link set dev eth0 mtu 9001" >> /etc/network/interfaces'
 sudo su -c 'echo br_netfilter >> /etc/modules'
 sudo su -c 'echo -e "NAME=Hyperspike\nID=hyperspike\nPRETTY_NAME=\"Hyperspike/Linux\"\nANSI_COLOR=\"0;35\"\nHOME_URL=\"https://hyperspike.io\"\nSUPPORT_URL=\"https://www.hyperspike.io/support\"\nBUG_REPORT_URL=\"https://bugs.hyperspike.io/\"" > /etc/os-release'
@@ -52,6 +52,8 @@ sudo su -c 'echo "net.ipv4.neigh.default.gc_thresh1=8096" >> /etc/sysctl.conf'
 sudo su -c 'echo "net.ipv4.neigh.default.gc_thresh2=12288" >> /etc/sysctl.conf'
 sudo su -c 'echo "net.ipv4.neigh.default.gc_thresh3=16384" >> /etc/sysctl.conf'
 
+sudo su -c 'echo -e "ipost-up ip link set dev eth0 mtu 9000" >> /etc/network/interfaces'
+
 sudo mkdir -p /etc/cni/net.d
 sudo mkdir -p /opt/cni/bin
 sudo su -c 'echo "runtime-endpoint: unix:///run/crio/crio.sock" >> /etc/crictl.yaml'
@@ -64,13 +66,12 @@ sudo rc-service crio start
 sudo rc-update add crio default
 sleep 5
 sudo rc-service crio restart
-sudo kubeadm config images pull
+sudo kubeadm config images pull --cri-socket /run/crio/crio.sock
 sudo cat /var/log/crio/crio.log
-# sudo crictl pull docker.io/cilium/operator:v1.6.4
 sudo crictl pull docker.io/cilium/cilium:v${CILIUM_VERSION}
 # sudo crictl -i /run/containerd/containerd.sock pull gcr.io/google-containers/startup-script:v1
 
-sudo rc-update add kubelet default
+# sudo rc-update add kubelet default
 #df -h
 #sudo su -c 'find / -maxdepth 1 -mindepth 1 -type d | xargs du -sh'
 #sudo su -c 'find /usr -maxdepth 1 -mindepth 1 -type d | xargs du -sh'
