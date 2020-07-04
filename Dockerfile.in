@@ -1,4 +1,4 @@
-FROM golang:@GO_VERSION@-alpine3.11 AS alpine-builder
+FROM golang:@GO_VERSION@-alpine3.12 AS alpine-builder
 
 # && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
@@ -47,11 +47,24 @@ RUN cd $GOPATH \
 
 FROM alpine-builder AS crun
 
+#RUN mkdir -p /root/criu-src \
+#	&& cd /root/criu-src \
+#	&& apk add yajl-dev yajl libcap-dev argp-standalone \
+#	&& curl -L https://github.com/containers/criu/releases/download/@CRIU_VERSION@/criu-@CRIU_VERSION@.tar.gz | tar xz --strip-components=1 -C . \
+#	&& ./configure --prefix=/usr --disable-systemd --enable-bpf CFLAGS="-O2 -Wall -g -Wextra -pipe" \
+#	&& cd libocispec \
+#	&& make V=1 && make V=1 DESTDIR=/root/criu install-exec \
+#	&& cd .. \
+#	&& make V=1 criu && make V=1 DESTDIR=/root/criu install-exec \
+#	&& tar -cvzf /root/criu-@CRIU_VERSION@.tar.gz -C /root/criu . \
+#	&& mkdir /build \
+#	&& cp /root/criu-@CRIU_VERSION@.tar.gz /build
+
 RUN mkdir -p /root/crun-src \
 	&& cd /root/crun-src \
-	&& apk add yajl-dev yajl libcap-dev argp-standalone \
-	&& curl -L https://github.com/containers/crun/releases/download/@CRUN_VERSION@/crun-@CRUN_VERSION@.tar.gz | tar xz --strip-components=1 -C . \
-	&& ./configure --prefix=/usr --disable-systemd --enable-bpf CFLAGS="-O2 -Wall -g -Wextra -pipe" \
+	&& apk add yajl-dev libtool autoconf automake yajl libcap-dev git python3 argp-standalone \
+	&& curl -L https://github.com/containers/crun/archive/master.tar.gz | tar xz --strip-components=1 -C . \
+	&& ./configure --prefix=/usr --disable-systemd --enable-bpf CFLAGS="-O2 -Wall -g -pipe" \
 	&& cd libocispec \
 	&& make V=1 && make V=1 DESTDIR=/root/crun install-exec \
 	&& cd .. \

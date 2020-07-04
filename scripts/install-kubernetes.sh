@@ -2,18 +2,19 @@
 
 sudo su -c 'echo http://dl-cdn.alpinelinux.org/alpine/edge/main/ >> /etc/apk/repositories'
 sudo su -c 'echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories'
-sudo su -c 'echo https://danmolik.com/alpine/ >> /etc/apk/repositories'
+sudo su -c 'echo @hyperspike https://danmolik.com/alpine/ >> /etc/apk/repositories'
 sudo su -c 'wget https://danmolik.com/alpine/alpine-devel@danmolik.com.rsa.pub -P /etc/apk/keys'
 sudo modprobe overlay
 sudo modprobe ext4
+sudo modprobe ip_tables
 sudo apk update
 sudo apk del linux-virt
-sudo apk --no-cache add linux-hyperspike
-sudo apk --no-cache add util-linux conmon
-sudo apk --no-cache add socat ethtool ipvsadm iproute2 iptables ebtables
+sudo apk --no-cache add linux-hyperspike@hyperspike
+sudo apk --no-cache add util-linux conmon@hyperspike
+sudo apk --no-cache add socat ethtool ipvsadm iproute2 iptables ebtables coreutils findutils
 sudo apk --no-cache upgrade
 
-sudo apk --no-cache add kubectl kubeadm kubelet cri-o crun crictl ca-certificates ipset conntrack-tools openssl jq aws-irsa
+sudo apk --no-cache add kubectl@hyperspike kubeadm@hyperspike kubelet@hyperspike cri-o@hyperspike crun@hyperspike crictl@hyperspike ca-certificates ipset conntrack-tools openssl jq aws-irsa@hyperspike
 sudo rm -rf /var/cache/apk/*
 #sudo mount -t tmpfs cgroup_root /sys/fs/cgroup
 #for d in cpuset memory cpu cpuacct blkio devices freezer net_cls perf_event net_prio hugetlb pids; do
