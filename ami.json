@@ -38,12 +38,7 @@
 					"volume_type": "gp2",
 					"delete_on_termination": true
 				}
-			],
-			"subnet_filter": {
-				"filters":{
-					"tag:Name":"packer"
-				}
-			}
+			]
 		},
 		{
 			"name": "hyperspike-us-east1",
@@ -73,12 +68,7 @@
 					"volume_type": "gp2",
 					"delete_on_termination": true
 				}
-			],
-			"subnet_filter": {
-				"filters":{
-					"tag:Name":"packer"
-				}
-			}
+			]
 		}
 	],
 	"provisioners": [
