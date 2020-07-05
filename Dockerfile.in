@@ -63,7 +63,7 @@ FROM alpine-builder AS crun
 RUN mkdir -p /root/crun-src \
 	&& cd /root/crun-src \
 	&& apk add yajl-dev libtool autoconf automake yajl libcap-dev git python3 argp-standalone \
-	&& curl -L https://github.com/containers/crun/archive/master.tar.gz | tar xz --strip-components=1 -C . \
+	&& curl -L https://github.com/containers/crun/releases/download/@CRUN_VERSION@/crun-@CRUN_VERSION@.tar.gz | tar xz --strip-components=1 -C . \
 	&& ./configure --prefix=/usr --disable-systemd --enable-bpf CFLAGS="-O2 -Wall -g -pipe" \
 	&& cd libocispec \
 	&& make V=1 && make V=1 DESTDIR=/root/crun install-exec \
