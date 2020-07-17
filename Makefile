@@ -7,6 +7,7 @@ CRUN_VERSION=$(shell cat VERSIONS|grep CRUN|sed -e 's/CRUN[\ \t]*=[\ \t]*//' )
 CRICTL_VERSION=$(shell cat VERSIONS|grep CRICTL|sed -e 's/CRICTL[\ \t]*=[\ \t]*//' )
 LINUX_VERSION=$(shell cat VERSIONS|grep LINUX|sed -e 's/LINUX[\ \t]*=[\ \t]*//' )
 ALPINE_VERSION=$(shell cat VERSIONS|grep ALPINE|sed -e 's/ALPINE[\ \t]*=[\ \t]*//' )
+ALPINE_MINOR=$(shell cat VERSIONS|grep ALPINE|sed -e 's/ALPINE[\ \t]*=[\ \t]*//' -e 's/\.[0-9]\+$$//' )
 HYPERSPIKE_VERSION=$(shell cat VERSIONS|grep HYPERSPIKE|sed -e 's/HYPERSPIKE[\ \t]*=[\ \t]*//' )
 CILIUM_VERSION=$(shell cat VERSIONS|grep CILIUM|sed -e 's/CILIUM[\ \t]*=[\ \t]*//' )
 SIGNING_KEY="$(shell if [ -d repo ] ; then cat repo/*.rsa |base64 -w 0; fi)"
@@ -47,11 +48,6 @@ version:
 	@echo "Go:         ${GO_VERSION}"
 	@echo "Linux:      ${LINUX_VERSION}"
 
-c := conmon-2.0.14-r0.apk
-
-t:
-	@echo $(c)
-
 Dockerfile: Dockerfile.in VERSIONS
 	sed -e "s/@CRIO_VERSION@/$(CRIO_VERSION)/g" \
 		-e "s/@GO_VERSION@/$(GO_VERSION)/g" \
@@ -59,6 +55,7 @@ Dockerfile: Dockerfile.in VERSIONS
 		-e "s/@CRUN_VERSION@/$(CRUN_VERSION)/g" \
 		-e "s/@CRICTL_VERSION@/$(CRICTL_VERSION)/g" \
 		-e "s/@CONMON_VERSION@/$(CONMON_VERSION)/g" \
+		-e "s/@ALPINE_MINOR@/$(ALPINE_MINOR)/g" \
 		-e "s/@LINUX_VERSION@/$(LINUX_VERSION)/g" \
 			$< > $@
 

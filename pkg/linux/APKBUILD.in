@@ -69,7 +69,7 @@ oldconfig() {
 		|| return 1
 
 	cp "$srcdir"/config-hyperspike.x86_64 "$_builddir"/.config
-	make -C "$srcdir"/linux-$_kernver \
+	make V=1 -C "$srcdir"/linux-$_kernver \
 		O="$_builddir" \
 		ARCH="x86_64" HOSTCC="$HOSTCC" \
 		listnewconfig oldconfig
@@ -79,7 +79,7 @@ build() {
 	unset LDFLAGS
 	export KBUILD_BUILD_TIMESTAMP="$(LC_ALL=C date -d @${SOURCE_DATE_EPOCH})"
 	cd "$srcdir"/build-hyperspike.x86_64
-	make -j4 ARCH="x86_64" CC="${CC:-gcc}" \
+	make V=1 -j4 ARCH="x86_64" CC="${CC:-gcc}" \
 		KBUILD_BUILD_VERSION="$((pkgrel + 1 ))-Hyperspike"
 }
 
@@ -94,7 +94,7 @@ package() {
 
 	mkdir -p "$pkgdir"/boot "$pkgdir"/lib/modules
 
-	make -j1 modules_install install \
+	make V=1 -j1 modules_install install \
 		ARCH="x86_64" \
 		INSTALL_MOD_PATH="$pkgdir" \
 		INSTALL_PATH="$pkgdir"/boot
@@ -163,4 +163,4 @@ _dev() {
 
 sha512sums="45bde01593f6147c8c169b9e46b4b56eee998142552ae0ff82f1dd21b1fd54f3b32f6283f6bd77ea717d374672167849e468c157f235d2f12f7d7816e4623bf6  linux-5.7.tar.xz
 faff8d331af29253b35092bc47eded31b2aa784f0db6ab9179f83da5a56d0ba0449385f6d277b80a587effee809ba552dda44e5d811a77a4983ffe0eeeddcb5c  config-hyperspike.x86_64
-1c19cb65d11a8498d4987574a973e1c3b2df6966c975d2edbfde902795f656139e6736a53b817c8567cc6cda614b5d8c2530bd50159d37ddad9312a17a125bc7  patch-5.7.7.xz"
+30eaa543ee1d371b5d05c7d8268e2e4fb55b5fee8f509070c677776744af47a743a36f655e5244e79d87a45a0ca7aae3eacdc9969e26d6b1d443a42db4bd5588  patch-5.7.9.xz"
