@@ -19,6 +19,15 @@ FROM alpine-builder AS aws-irsa
 	&& mkdir /build \
 	&& cp aws-irsa /build
 
+FROM alpine-builder AS hyperctl
+
+	RUN mkdir -p src/hyperspike.io/hyperctl \
+	&& cd src/hyperspike.io/hyperctl \
+	&& curl -L https://github.com/hyperspike/hyperctl/archive/master.tar.gz | tar xz --strip-components=1 -C . \
+	&& go build -ldflags "-X hyperspike.io/hyperctl.Version=@HYPERSPIKE_VERSION@" -v -o hyperctl ./cmd/ \
+	&& mkdir /build \
+	&& cp hyperctl /build
+
 FROM alpine-builder AS cri-o
 
 RUN cd $GOPATH \
@@ -103,6 +112,7 @@ COPY --from=k8s      /build/kubelet             /build/kubelet
 COPY --from=k8s      /build/kubectl             /build/kubectl
 COPY --from=k8s      /build/kubeadm             /build/kubeadm
 COPY --from=crictl   /build/crictl              /build/crictl
+COPY --from=hyperctl /build/hyperctl            /build/hyperctl
 COPY --from=aws-irsa /build/aws-irsa            /build/aws-irsa
 COPY --from=conmon   /build/conmon-@CONMON_VERSION@.tar.gz /build/conmon-@CONMON_VERSION@.tar.gz
 COPY --from=cri-o    /build/cri-o-@CRIO_VERSION@.tar.gz /build/cri-o-@CRIO_VERSION@.tar.gz
@@ -129,7 +139,7 @@ RUN if [ -z $SIGNING_KEY ] || [ -z $SIGNING_PUB ] ; then \
 	&& git add * \
 	&& git commit -a -m 'add all' \
 	&& cd linux && abuild -FRrk && abuild -F cleanoldpkg && cd ../ \
-	&& for p in aws-irsa conmon crictl cri-o crun kubelet kubeadm kubectl ; do cd $p && mv /build/$p* . && echo "sha512sums=\"$(sha512sum ${p}*)\"" >> APKBUILD && abuild -FRk && abuild -F cleanoldpkg && cd ../ ; done \
+	&& for p in aws-irsa hyperctl conmon crictl cri-o crun kubelet kubeadm kubectl ; do cd $p && mv /build/$p* . && echo "sha512sums=\"$(sha512sum ${p}*)\"" >> APKBUILD && abuild -FRk && abuild -F cleanoldpkg && cd ../ ; done \
 	; echo done \
 	&& apk index -o /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/*.apk \
 	&& cp /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/APKINDEX.tar.gz \

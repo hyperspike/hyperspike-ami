@@ -14,7 +14,7 @@ sudo apk --no-cache add util-linux conmon@hyperspike
 sudo apk --no-cache add socat ethtool ipvsadm iproute2 iptables ebtables coreutils findutils
 sudo apk --no-cache upgrade
 
-sudo apk --no-cache add kubectl@hyperspike kubeadm@hyperspike kubelet@hyperspike cri-o@hyperspike crun@hyperspike crictl@hyperspike ca-certificates ipset conntrack-tools openssl jq aws-irsa@hyperspike
+sudo apk --no-cache add kubectl@hyperspike hyperctl@hyperspike kubeadm@hyperspike kubelet@hyperspike cri-o@hyperspike crun@hyperspike crictl@hyperspike ca-certificates ipset conntrack-tools openssl jq aws-irsa@hyperspike
 sudo rm -rf /var/cache/apk/*
 #sudo mount -t tmpfs cgroup_root /sys/fs/cgroup
 #for d in cpuset memory cpu cpuacct blkio devices freezer net_cls perf_event net_prio hugetlb pids; do

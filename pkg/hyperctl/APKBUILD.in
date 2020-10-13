@@ -1,0 +1,23 @@
+# Maintainer: Dan Molik <dan@danmolik.com>
+pkgname=hyperctl
+pkgver=0.0.1
+pkgrel=0
+pkgdesc="A CLI to create Hyperspike Clusters from Scratch"
+url="https://github.com/hyperspike/hyperctl"
+arch="x86_64"
+license="MIT"
+source="$pkgname"
+
+build() {
+	echo "skip"
+}
+
+check() {
+	echo "skip"
+}
+
+package() {
+	cd "$srcdir"
+	install -Dm755 "$pkgname" "$pkgdir"/usr/bin/"$pkgname"
+}
+

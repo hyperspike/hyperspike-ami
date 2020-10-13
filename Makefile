@@ -19,7 +19,7 @@ default: all
 
 all: pkgs ami
 
-pkgs: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux/APKBUILD pkg/aws-irsa/APKBUILD
+pkgs: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux/APKBUILD pkg/aws-irsa/APKBUILD pkg/hyperctl/APKBUILD
 	@if [ -d repo ] ; then \
 		echo "using existing keys" ; \
 		docker build --build-arg SIGNING_KEY=$(SIGNING_KEY) --build-arg SIGNING_PUB=$(SIGNING_PUB) -t dan/alpine-repo:latest . ; \
@@ -55,6 +55,7 @@ Dockerfile: Dockerfile.in VERSIONS
 		-e "s/@CRUN_VERSION@/$(CRUN_VERSION)/g" \
 		-e "s/@CRICTL_VERSION@/$(CRICTL_VERSION)/g" \
 		-e "s/@CONMON_VERSION@/$(CONMON_VERSION)/g" \
+		-e "s/@HYPERSPIKE_VERSION@/$(HYPERSPIKE_VERSION)/g" \
 		-e "s/@ALPINE_MINOR@/$(ALPINE_MINOR)/g" \
 		-e "s/@LINUX_VERSION@/$(LINUX_VERSION)/g" \
 			$< > $@
