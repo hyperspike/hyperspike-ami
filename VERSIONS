@@ -1,6 +1,6 @@
 KUBERNETES = 1.18.9
 CONMON     = 2.0.20
-CRUN       = 0.14.1
+CRUN       = 0.15.0
 CRIO       = 1.18.3
 CRICTL     = 1.18.0
 LINUX      = 5.8.1
