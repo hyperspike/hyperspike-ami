@@ -1,6 +1,6 @@
 # Maintainer: Dan Molik <dan@danmolik.com>
 pkgname=hyperctl
-pkgver=0.0.1
+pkgver=@HYPERSPIKE_VERSION@
 pkgrel=0
 pkgdesc="A CLI to create Hyperspike Clusters from Scratch"
 url="https://github.com/hyperspike/hyperctl"

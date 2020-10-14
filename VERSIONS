@@ -8,4 +8,4 @@ ALPINE     = 3.12.0
 GO         = 1.14.9
 CILIUM     = 1.8.4
 
-HYPERSPIKE = 0.3.6
+HYPERSPIKE = 0.3.11
