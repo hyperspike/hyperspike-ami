@@ -138,9 +138,9 @@ RUN if [ -z $SIGNING_KEY ] || [ -z $SIGNING_PUB ] ; then \
 	&& git init . \
 	&& git add * \
 	&& git commit -a -m 'add all' \
-	&& cd linux && abuild -FRrk && abuild -F cleanoldpkg && cd ../ \
 	&& for p in aws-irsa hyperctl conmon crictl cri-o crun kubelet kubeadm kubectl ; do cd $p && mv /build/$p* . && echo "sha512sums=\"$(sha512sum ${p}*)\"" >> APKBUILD && abuild -FRk && abuild -F cleanoldpkg && cd ../ ; done \
 	; echo done \
+	&& cd linux && abuild -FRrk && abuild -F cleanoldpkg && cd ../ \
 	&& apk index -o /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/*.apk \
 	&& cp /root/packages/pkg/x86_64/APKINDEX.unsigned.tar.gz /root/packages/pkg/x86_64/APKINDEX.tar.gz \
 	&& abuild-sign -k /root/.abuild/*.rsa /root/packages/pkg/x86_64/APKINDEX.tar.gz \
