@@ -1,8 +1,6 @@
 FROM golang:@GO_VERSION@-alpine@ALPINE_MINOR@ AS alpine-builder
 
-# && echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
 RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
-	&& sed -i -e 's/3\.10/3.11/' /etc/apk/repositories \
 	&& apk update \
 	&& apk upgrade \
 	&& apk add rsync alpine-sdk binutils bash linux-headers libseccomp-dev glib-dev gpgme-dev libassuan-dev \

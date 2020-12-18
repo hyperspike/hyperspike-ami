@@ -16,7 +16,14 @@
 			"access_key": "{{user `aws_access_key`}}",
 			"secret_key": "{{user `aws_secret_key`}}",
 			"region": "{{user `region`}}",
-			"source_ami": "ami-008a61f78ba92b950",
+			"source_ami_filter": {
+				"filters": {
+					"name": "alpine-ami-{{user `alpine`}}*",
+					"architecture": "x86_64"
+				},
+				"owners": [ "538276064493" ],
+				"most_recent": true
+			},
 			"instance_type": "t2.micro",
 			"ssh_username": "alpine",
 			"ami_name": "hyperspike-{{user `hyperspike`}}",
@@ -46,7 +53,14 @@
 			"access_key": "{{user `aws_access_key`}}",
 			"secret_key": "{{user `aws_secret_key`}}",
 			"region": "us-east-1",
-			"source_ami": "ami-05b66a197a19e3fcc",
+			"source_ami_filter": {
+				"filters": {
+					"name": "alpine-ami-{{user `alpine`}}*",
+					"architecture": "x86_64"
+				},
+				"owners": [ "538276064493" ],
+				"most_recent": true
+			},
 			"instance_type": "t2.micro",
 			"ssh_username": "alpine",
 			"ami_name": "hyperspike-{{user `hyperspike`}}",
