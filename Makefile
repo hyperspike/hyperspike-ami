@@ -20,7 +20,7 @@ default: all
 
 all: pkgs ami
 
-pkgs: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubernetes/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux/APKBUILD pkg/hyperctl/APKBUILD
+pkgs: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubernetes/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux-hyperspike/APKBUILD pkg/hyperctl/APKBUILD
 	@if [ -d repo ] ; then \
 		echo "using existing keys" ; \
 		docker build --build-arg SIGNING_KEY=$(SIGNING_KEY) --build-arg SIGNING_PUB=$(SIGNING_PUB) -t dan/alpine-repo:latest . ; \
