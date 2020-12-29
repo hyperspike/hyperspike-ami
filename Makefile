@@ -26,7 +26,8 @@ pkgs: repo/pkg/x86_64/cri-o-$(CRIO_VERSION)-r0.apk repo/pkg/x86_64/kubernetes-$(
 	repo/pkg/x86_64/hyperctl-$(HYPERSPIKE_VERSION)-r0.apk
 
 ami:
-	HYPERSPIKE_VERSION=$(HYPERSPIKE_VERSION) \
+	aws ec2 describe-images --owner self   --filters 'Name=name,Values=hyperspike-*' | jq -Mr '.Images[] | .Name ' | grep -x hyperspike-$(HYPERSPIKE_VERSION) \
+		|| HYPERSPIKE_VERSION=$(HYPERSPIKE_VERSION) \
 		K8S_VERSION=$(K8S_VERSION) \
 		ALPINE_VERSION=$(ALPINE_VERSION) \
 		KERNEL_VERSION=$(LINUX_VERSION) \

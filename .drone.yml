@@ -36,7 +36,13 @@ steps:
   commands:
   - export MC_HOST_minio=http://$MINIO_ACCESS_KEY:$MINIO_SECRET_KEY@10.12.4.114:9000
   - make upload
-#- name: build-ami
-#  image: graytshirt/packer
-#  commands:
-#  - make ami
+- name: build-ami
+  image: graytshirt/packer
+  environment:
+    AWS_ACCESS_KEY_ID:
+      from_secret: aws_access_key
+    AWS_SECRET_ACCESS_KEY:
+      from_secret: aws_secret_access_key
+    AWS_DEFAULT_REGION: us-east-2
+  commands:
+  - make ami
