@@ -89,12 +89,12 @@ download:
 .SECONDEXPANSION:
 repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}//')/APKBUILD
 	@echo Building $(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//')
-	@if [ "$(DISTRO)" = "alpine" ] ; then
+	@if [ "$(DISTRO)" = "alpine" ] ; then \
 		if [ -z $(APK_KEY) ] || [ -z $(APK_PUB_KEY) ] ; then \
 			abuild-keygen -n \
 			&& mv /root/.abuild/*.rsa /root/.abuild/alpine-devel@danmolik.com.rsa \
 			&& mv /root/.abuild/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub \
-			&& cp /root/.abuild/*.rsa* repo/ ' ; \
+			&& cp /root/.abuild/*.rsa* repo/ ; \
 		else \
 			mkdir -p /root/.abuild/ \
 			&& echo $(APK_KEY)|base64 -d > /root/.abuild/alpine-devel@danmolik.com.rsa \
@@ -110,7 +110,7 @@ repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]
 		&& apk index -o repo/x86_64/APKINDEX.unsigned.tar.gz repo/x86_64/*.apk \
 		&& cp repo/x86_64/APKINDEX.unsigned.tar.gz repo/x86_64/APKINDEX.tar.gz \
 		&& abuild-sign -k /root/.abuild/*.rsa repo/x86_64/APKINDEX.tar.gz ; \
-	else
+	else \
 		docker run -it \
 		-v $(PWD)/pkg/$(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//'):/build \
 		-v $(PWD)/repo:/root/packages \
