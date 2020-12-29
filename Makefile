@@ -90,7 +90,7 @@ download:
 repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}//')/APKBUILD
 	@echo Building $(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//')
 	@if [ "$(DISTRO)" = "alpine" ] ; then \
-		if [ -z $(APK_KEY) ] || [ -z $(APK_PUB_KEY) ] ; then \
+		if [ -z $(APK_KEY) ] || [ -z $(APK_KEY_PUB) ] ; then \
 			abuild-keygen -n \
 			&& mv /root/.abuild/*.rsa /root/.abuild/alpine-devel@danmolik.com.rsa \
 			&& mv /root/.abuild/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub \
