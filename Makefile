@@ -81,10 +81,18 @@ apk-fetcher:
 
 .PHONY: upload download
 upload:
-	mc cp --recursive repo/x86_64/ minio/alpine/x86_64/
+	@if [ "$(DISTRO)" = "alpine" ] ; then \
+		mc cp --recursive repo/pkg/x86_64/ minio/alpine/x86_64/ ; \
+	else \
+		mc cp --recursive repo/x86_64/     minio/alpine/x86_64/ ; \
+	fi
 
 download:
-	mc cp --recursive minio/alpine/x86_64/ repo/x86_64/
+	@if [ "$(DISTRO)" = "alpine" ] ; then \
+		mc cp --recursive minio/alpine/x86_64/ repo/pkg/x86_64/ ; \
+	else \
+		mc cp --recursive minio/alpine/x86_64/ repo/x86_64/ ; \
+	fi
 
 .SECONDEXPANSION:
 repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}//')/APKBUILD
