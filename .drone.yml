@@ -8,7 +8,7 @@ platform:
 
 steps:
 - name: fetch
-  image: graytshirt/alpine-fetch
+  image: graytshirt/alpine-fetcher
   environment:
     MINIO_ACCESS_KEY:
       from_secret: minio_access_key
@@ -22,7 +22,7 @@ steps:
   commands:
   - make pkgs
 - name: upload-pkgs
-  image: graytshirt/alpine-fetch
+  image: graytshirt/alpine-fetcher
   environment:
     MINIO_ACCESS_KEY:
       from_secret: minio_access_key
