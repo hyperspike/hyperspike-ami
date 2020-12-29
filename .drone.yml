@@ -48,3 +48,8 @@ steps:
     AWS_DEFAULT_REGION: us-east-2
   commands:
   - make ami
+---
+kind: signature
+hmac: 7bc22b8dc623668da5acef969d3c46b0bab34d4ad58024afcbdb7808101be48e
+
+...
