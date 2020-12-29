@@ -20,17 +20,10 @@ default: all
 
 all: pkgs ami
 
-pkgs: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubernetes/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux-hyperspike/APKBUILD pkg/hyperctl/APKBUILD
-	@if [ -d repo ] ; then \
-		echo "using existing keys" ; \
-		docker build --build-arg SIGNING_KEY=$(SIGNING_KEY) --build-arg SIGNING_PUB=$(SIGNING_PUB) -t dan/alpine-repo:latest . ; \
-	else \
-		docker build -t dan/alpine-repo:latest . ; \
-	fi
-	docker ps -a |grep alpine-repo && docker rm $$(docker ps -a | awk '$$NF ~ /alpine-repo/ {print $$1}') || true
-	docker create --name alpine-repo dan/alpine-repo
-	rm -rf ./repo
-	docker cp alpine-repo:/root/packages/pkg ./repo
+pkgs: repo/x86_64/cri-o-$(CRIO_VERSION)-r0.apk repo/x86_64/kubernetes-$(K8S_VERSION)-r0.apk \
+	repo/x86_64/conmon-$(CONMON_VERSION)-r0.apk repo/x86_64/linux-hyperspike-$(LINUX_VERSION)-r0.apk \
+	repo/x86_64/crun-$(CRUN_VERSION)-r0.apk repo/x86_64/crictl-$(CRICTL_VERSION)-r0.apk \
+	repo/x86_64/hyperctl-$(HYPERSPIKE_VERSION)-r0.apk
 
 ami:
 	HYPERSPIKE_VERSION=$(HYPERSPIKE_VERSION) \
