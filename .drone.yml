@@ -14,8 +14,8 @@ steps:
       from_secret: minio_access_key
     MINIO_SECRET_KEY:
       from_secret: minio_secret_key
-    MC_HOST_minio: http://$${MINIO_ACCESS_KEY}:$${MINIO_SECRET_KEY}@10.12.4.114:9000
   commands:
+  - export MC_HOST_minio=http://$MINIO_ACCESS_KEY:$MINIO_SECRET_KEY@10.12.4.114:9000
   - make download
 - name: build-pkgs
   image: graytshirt/alpine-builder
@@ -28,8 +28,8 @@ steps:
       from_secret: minio_access_key
     MINIO_SECRET_KEY:
       from_secret: minio_secret_key
-    MC_HOST_minio: http://$${MINIO_ACCESS_KEY}:$${MINIO_SECRET_KEY}@10.12.4.114:9000
   commands:
+  - export MC_HOST_minio=http://$MINIO_ACCESS_KEY:$MINIO_SECRET_KEY@10.12.4.114:9000
   - make upload
 #- name: build-ami
 #  image: graytshirt/packer
