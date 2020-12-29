@@ -117,9 +117,9 @@ repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]
 		&& abuild -F -P ../../repo clean \
 		&& abuild -FRrk -P ../../repo cleanoldpkg \
 		&& cd ../../ \
-		&& apk index -o repo/x86_64/APKINDEX.unsigned.tar.gz repo/x86_64/*.apk \
-		&& cp repo/x86_64/APKINDEX.unsigned.tar.gz repo/x86_64/APKINDEX.tar.gz \
-		&& abuild-sign -k /root/.abuild/*.rsa repo/x86_64/APKINDEX.tar.gz ; \
+		&& apk index -o repo/pkg/x86_64/APKINDEX.unsigned.tar.gz repo/pkg/x86_64/*.apk \
+		&& cp repo/pkg/x86_64/APKINDEX.unsigned.tar.gz repo/pkg/x86_64/APKINDEX.tar.gz \
+		&& abuild-sign -k /root/.abuild/*.rsa repo/pkg/x86_64/APKINDEX.tar.gz ; \
 	else \
 		docker run -it \
 		-v $(PWD)/pkg/$(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//'):/build \
