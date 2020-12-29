@@ -23,15 +23,15 @@ check() {
 }
 
 package() {
-	echo "meta package"
-	install -d -Dm755 $pkgdir/usr/share/kubernetes
+	install -Dm644 $srcdir/$pkgname-$pkgver/README.md $pkgdir/usr/share/docs/kubernetes/README.md
+	gzip -9 $pkgdir/usr/share/docs/kubernetes/README.md
 }
 
 kubelet() {
 	pkgdesc="The Kubernetes 'node agent'"
 	install -Dm755 $srcdir/$pkgname-$pkgver/_output/bin/$subpkgname $subpkgdir/usr/bin/$subpkgname
-	install -D -m755 $srcdir/"$subpkgname".initd "$subpkgdir"/etc/init.d/"$subpkgname"
-	install -D -m644 $srcdir/"$subpkgname".confd "$subpkgdir"/etc/conf.d/"$subpkgname"
+	install -Dm755 $srcdir/"$subpkgname".initd "$subpkgdir"/etc/init.d/"$subpkgname"
+	install -Dm644 $srcdir/"$subpkgname".confd "$subpkgdir"/etc/conf.d/"$subpkgname"
 }
 
 kubeadm() {
