@@ -14,7 +14,7 @@ steps:
       from_secret: minio_access_key
     MINIO_SECRET_KEY:
       from_secret: minio_secret_key
-    MC_HOST_minio: http://$${MINIO_ACCESS_KEY}:$${MINIO_SECRET_KEY}@10.12.4.114
+    MC_HOST_minio: http://$${MINIO_ACCESS_KEY}:$${MINIO_SECRET_KEY}@10.12.4.114:9000
   commands:
   - make download
 - name: build-pkgs
@@ -28,7 +28,7 @@ steps:
       from_secret: minio_access_key
     MINIO_SECRET_KEY:
       from_secret: minio_secret_key
-    MC_HOST_minio: http://$${MINIO_ACCESS_KEY}:$${MINIO_SECRET_KEY}@10.12.4.114
+    MC_HOST_minio: http://$${MINIO_ACCESS_KEY}:$${MINIO_SECRET_KEY}@10.12.4.114:9000
   commands:
   - make upload
 #- name: build-ami
