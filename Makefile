@@ -89,6 +89,9 @@ upload:
 	else \
 		mc cp --recursive repo/x86_64/     minio/alpine/x86_64/ ; \
 	fi
+	@echo $(APK_KEY_PUB)|base64 -d > repo/alpine-devel@danmolik.com.rsa.pub
+	@mc cp repo/*.pub          minio/alpine/
+	@mc policy -r set download minio/alpine/
 
 download:
 	@if [ "$(DISTRO)" = "alpine" ] ; then \
