@@ -20,10 +20,10 @@ default: all
 
 all: pkgs ami
 
-pkgs: repo/x86_64/cri-o-$(CRIO_VERSION)-r0.apk repo/x86_64/kubernetes-$(K8S_VERSION)-r0.apk \
-	repo/x86_64/conmon-$(CONMON_VERSION)-r0.apk repo/x86_64/linux-hyperspike-$(LINUX_VERSION)-r0.apk \
-	repo/x86_64/crun-$(CRUN_VERSION)-r0.apk repo/x86_64/crictl-$(CRICTL_VERSION)-r0.apk \
-	repo/x86_64/hyperctl-$(HYPERSPIKE_VERSION)-r0.apk
+pkgs: repo/pkg/x86_64/cri-o-$(CRIO_VERSION)-r0.apk repo/pkg/x86_64/kubernetes-$(K8S_VERSION)-r0.apk \
+	repo/pkg/x86_64/conmon-$(CONMON_VERSION)-r0.apk repo/pkg/x86_64/linux-hyperspike-$(LINUX_VERSION)-r0.apk \
+	repo/pkg/x86_64/crun-$(CRUN_VERSION)-r0.apk repo/pkg/x86_64/crictl-$(CRICTL_VERSION)-r0.apk \
+	repo/pkg/x86_64/hyperctl-$(HYPERSPIKE_VERSION)-r0.apk
 
 ami:
 	HYPERSPIKE_VERSION=$(HYPERSPIKE_VERSION) \
@@ -95,7 +95,7 @@ download:
 	fi
 
 .SECONDEXPANSION:
-repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}//')/APKBUILD
+repo/pkg/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}//')/APKBUILD
 	@echo Building $(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//')
 	@if [ "$(DISTRO)" = "alpine" ] ; then \
 		if [ -z $(APK_KEY) ] || [ -z $(APK_KEY_PUB) ] ; then \
