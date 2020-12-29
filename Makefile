@@ -136,7 +136,7 @@ repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]
 			&& apk index -o /root/packages/x86_64/APKINDEX.unsigned.tar.gz /root/packages/x86_64/*.apk \
 			&& cp /root/packages/x86_64/APKINDEX.unsigned.tar.gz /root/packages/x86_64/APKINDEX.tar.gz \
 			&& abuild-sign -k /root/.abuild/*.rsa /root/packages/x86_64/APKINDEX.tar.gz \
-			&& cp /root/.abuild/*.rsa* /root/packages/ ' ;
+			&& cp /root/.abuild/*.rsa* /root/packages/ ' ; \
 	fi
 
 
