@@ -90,27 +90,26 @@ download:
 repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}//')/APKBUILD
 	@echo Building $(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//')
 	@if "$(DISTRO)" = "alpine" ; then
-		if [ -f /root/packages/*.rsa ] && [ -f /root/packages/*.rsa.pub ] ; then \
-			mkdir -p /root/.abuild \
-			&& cp /root/packages/*.rsa /root/.abuild/alpine-devel@danmolik.com.rsa \
-			&& cp /root/packages/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
-		else \
+		if [ -z $(APK_KEY) ] || [ -z $(APK_PUB_KEY) ] ; then \
 			abuild-keygen -n \
 			&& mv /root/.abuild/*.rsa /root/.abuild/alpine-devel@danmolik.com.rsa \
-			&& mv /root/.abuild/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
+			&& mv /root/.abuild/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub \
+			&& cp /root/.abuild/*.rsa* repo/ ' ; \
+		else \
+			mkdir -p /root/.abuild/ \
+			&& echo $(APK_KEY)|base64 -d > /root/.abuild/alpine-devel@danmolik.com.rsa \
+			&& echo $(APK_KEY_PUB)|base64 -d > /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
 		fi \
 		&& echo "PACKAGER_PRIVKEY=\"/root/.abuild/alpine-devel@danmolik.com.rsa\"" > /root/.abuild/abuild.conf \
 		&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \
-		&& cd /build \
 		&& abuild -FRrk fetch \
 		&& abuild -FRrk checksum \
 		&& abuild -FRrk \
 		&& abuild -F clean \
 		&& abuild -FRrk cleanoldpkg \
-		&& apk index -o /root/packages/x86_64/APKINDEX.unsigned.tar.gz /root/packages/x86_64/*.apk \
-		&& cp /root/packages/x86_64/APKINDEX.unsigned.tar.gz /root/packages/x86_64/APKINDEX.tar.gz \
-		&& abuild-sign -k /root/.abuild/*.rsa /root/packages/x86_64/APKINDEX.tar.gz \
-		&& cp /root/.abuild/*.rsa* /root/packages/ ' ;
+		&& apk index -o repo/x86_64/APKINDEX.unsigned.tar.gz repo/x86_64/*.apk \
+		&& cp repo/x86_64/APKINDEX.unsigned.tar.gz repo/x86_64/APKINDEX.tar.gz \
+		&& abuild-sign -k /root/.abuild/*.rsa repo/x86_64/APKINDEX.tar.gz ; \
 	else
 		docker run -it \
 		-v $(PWD)/pkg/$(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//'):/build \

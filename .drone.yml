@@ -19,6 +19,11 @@ steps:
   - make download
 - name: build-pkgs
   image: graytshirt/alpine-builder
+  environment:
+    APK_KEY:
+      from_secret: apk_key
+    APK_KEY_PUB:
+      from_secret: apk_key_pub
   commands:
   - make pkgs
 - name: upload-pkgs
