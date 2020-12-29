@@ -111,11 +111,11 @@ repo/pkg/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[
 		&& echo "PACKAGER_PRIVKEY=\"/root/.abuild/alpine-devel@danmolik.com.rsa\"" > /root/.abuild/abuild.conf \
 		&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \
 		&& cd $(shell echo $< | sed -e 's/\/APKBUILD//' ) \
-		&& abuild -FRrk -P ../../repo fetch \
-		&& abuild -FRrk -P ../../repo checksum \
-		&& abuild -FRrk -P ../../repo \
-		&& abuild -F -P ../../repo clean \
-		&& abuild -FRrk -P ../../repo cleanoldpkg \
+		&& abuild -FRrk -P ${PWD}/repo fetch \
+		&& abuild -FRrk -P ${PWD}/repo checksum \
+		&& abuild -FRrk -P ${PWD}/repo \
+		&& abuild -F -P ${PWD}/repo clean \
+		&& abuild -FRrk -P ${PWD}/repo cleanoldpkg \
 		&& cd ../../ \
 		&& apk index -o repo/pkg/x86_64/APKINDEX.unsigned.tar.gz repo/pkg/x86_64/*.apk \
 		&& cp repo/pkg/x86_64/APKINDEX.unsigned.tar.gz repo/pkg/x86_64/APKINDEX.tar.gz \
