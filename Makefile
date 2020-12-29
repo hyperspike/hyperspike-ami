@@ -43,18 +43,6 @@ version:
 	@echo "Go:         ${GO_VERSION}"
 	@echo "Linux:      ${LINUX_VERSION}"
 
-Dockerfile: Dockerfile.in VERSIONS
-	sed -e "s/@CRIO_VERSION@/$(CRIO_VERSION)/g" \
-		-e "s/@GO_VERSION@/$(GO_VERSION)/g" \
-		-e "s/@K8S_VERSION@/$(K8S_VERSION)/g" \
-		-e "s/@CRUN_VERSION@/$(CRUN_VERSION)/g" \
-		-e "s/@CRICTL_VERSION@/$(CRICTL_VERSION)/g" \
-		-e "s/@CONMON_VERSION@/$(CONMON_VERSION)/g" \
-		-e "s/@HYPERSPIKE_VERSION@/$(HYPERSPIKE_VERSION)/g" \
-		-e "s/@ALPINE_MINOR@/$(ALPINE_MINOR)/g" \
-		-e "s/@LINUX_VERSION@/$(LINUX_VERSION)/g" \
-			$< > $@
-
 pkg/%/APKBUILD: pkg/%/APKBUILD.in VERSIONS
 	sed -e "s/@CRIO_VERSION@/$(CRIO_VERSION)/g" \
 		-e "s/@GO_VERSION@/$(GO_VERSION)/g" \
