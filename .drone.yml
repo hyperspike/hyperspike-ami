@@ -1,0 +1,37 @@
+---
+kind: pipeline
+name: default
+
+platform:
+  os: linux
+  arch: amd64
+
+steps:
+- name: fetch
+  image: graytshirt/alpine-fetch
+  environment:
+    MINIO_ACCESS_KEY:
+      from_secret: minio_access_key
+    MINIO_SECRET_KEY:
+      from_secret: minio_secret_key
+    MC_HOST_minio: http://$${MINIO_ACCESS_KEY}:$${MINIO_SECRET_KEY}@10.12.4.114
+  commands:
+  - make download
+- name: build-pkgs
+  image: graytshirt/alpine-builder
+  commands:
+  - make pkgs
+- name: upload-pkgs
+  image: graytshirt/alpine-fetch
+  environment:
+    MINIO_ACCESS_KEY:
+      from_secret: minio_access_key
+    MINIO_SECRET_KEY:
+      from_secret: minio_secret_key
+    MC_HOST_minio: http://$${MINIO_ACCESS_KEY}:$${MINIO_SECRET_KEY}@10.12.4.114
+  commands:
+  - make upload
+#- name: build-ami
+#  image: graytshirt/packer
+#  commands:
+#  - make ami

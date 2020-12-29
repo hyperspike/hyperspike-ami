@@ -6,11 +6,11 @@ pkgdesc="Container monitor in C"
 url="https://github.com/containers/conmon"
 arch="x86_64"
 license="Apache-2.0"
-source="$pkgname-$pkgver.tar.gz"
+source="$pkgname-$pkgver.tar.gz::https://github.com/containers/$pkgname/archive/v$pkgver.tar.gz"
 
 build() {
-	echo "skip"
-
+	cd $srcdir/$pkgname-$pkgver
+	make V=1
 }
 
 check() {
@@ -18,7 +18,7 @@ check() {
 }
 
 package() {
-	cd "$srcdir"
-	install -Dm755 usr/bin/"$pkgname" "$pkgdir"/usr/bin/"$pkgname"
+	cd $srcdir/$pkgname-$pkgver
+	make DESTDIR=$pkgdir PREFIX=/usr install
+	rm -rf $pkgdir/usr/share
 }
-

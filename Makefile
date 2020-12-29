@@ -12,6 +12,7 @@ HYPERSPIKE_VERSION=$(shell cat VERSIONS|grep HYPERSPIKE|sed -e 's/HYPERSPIKE[\ \
 CILIUM_VERSION=$(shell cat VERSIONS|grep CILIUM|sed -e 's/CILIUM[\ \t]*=[\ \t]*//' )
 SIGNING_KEY="$(shell if [ -d repo ] ; then cat repo/*.rsa |base64 -w 0; fi)"
 SIGNING_PUB="$(shell if [ -d repo ] ; then cat repo/*.rsa.pub|base64 -w 0 ; fi)"
+DISTRO=$(shell eval $$(cat /etc/os-release); echo $$ID )
 
 default: all
 
@@ -19,7 +20,7 @@ default: all
 
 all: pkgs ami
 
-pkgs: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubelet/APKBUILD pkg/kubectl/APKBUILD pkg/kubeadm/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux/APKBUILD pkg/aws-irsa/APKBUILD pkg/hyperctl/APKBUILD
+pkgs: VERSIONS Dockerfile pkg/cri-o/APKBUILD pkg/kubernetes/APKBUILD pkg/crun/APKBUILD pkg/conmon/APKBUILD pkg/crictl/APKBUILD pkg/linux/APKBUILD pkg/hyperctl/APKBUILD
 	@if [ -d repo ] ; then \
 		echo "using existing keys" ; \
 		docker build --build-arg SIGNING_KEY=$(SIGNING_KEY) --build-arg SIGNING_PUB=$(SIGNING_PUB) -t dan/alpine-repo:latest . ; \
@@ -76,3 +77,74 @@ clean:
 
 real-clean: clean
 	rm -rf repo
+
+.PHONY: utils apk-builder apk-fetcher
+utils: apk-builder apk-fetcher
+
+apk-builder:
+	docker build -f utils/Dockerfile.apk-builder -t graytshirt/alpine-builder ./utils
+apk-fetcher:
+	docker build -f utils/Dockerfile.apk-fetcher -t graytshirt/alpine-fetcher ./utils
+
+.PHONY: upload download
+upload:
+	mc cp --recursive repo/x86_64/ minio/alpine/x86_64/
+
+download:
+	mc cp --recursive minio/alpine/x86_64/ repo/x86_64/
+
+.SECONDEXPANSION:
+repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}//')/APKBUILD
+	@echo Building $(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//')
+	@if "$(DISTRO)" = "alpine" ; then
+		if [ -f /root/packages/*.rsa ] && [ -f /root/packages/*.rsa.pub ] ; then \
+			mkdir -p /root/.abuild \
+			&& cp /root/packages/*.rsa /root/.abuild/alpine-devel@danmolik.com.rsa \
+			&& cp /root/packages/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
+		else \
+			abuild-keygen -n \
+			&& mv /root/.abuild/*.rsa /root/.abuild/alpine-devel@danmolik.com.rsa \
+			&& mv /root/.abuild/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
+		fi \
+		&& echo "PACKAGER_PRIVKEY=\"/root/.abuild/alpine-devel@danmolik.com.rsa\"" > /root/.abuild/abuild.conf \
+		&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \
+		&& cd /build \
+		&& abuild -FRrk fetch \
+		&& abuild -FRrk checksum \
+		&& abuild -FRrk \
+		&& abuild -F clean \
+		&& abuild -FRrk cleanoldpkg \
+		&& apk index -o /root/packages/x86_64/APKINDEX.unsigned.tar.gz /root/packages/x86_64/*.apk \
+		&& cp /root/packages/x86_64/APKINDEX.unsigned.tar.gz /root/packages/x86_64/APKINDEX.tar.gz \
+		&& abuild-sign -k /root/.abuild/*.rsa /root/packages/x86_64/APKINDEX.tar.gz \
+		&& cp /root/.abuild/*.rsa* /root/packages/ ' ;
+	else
+		docker run -it \
+		-v $(PWD)/pkg/$(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//'):/build \
+		-v $(PWD)/repo:/root/packages \
+		graytshirt/alpine-builder \
+		/bin/sh -c ' \
+			if [ -f /root/packages/*.rsa ] && [ -f /root/packages/*.rsa.pub ] ; then \
+				mkdir -p /root/.abuild \
+				&& cp /root/packages/*.rsa /root/.abuild/alpine-devel@danmolik.com.rsa \
+				&& cp /root/packages/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
+			else \
+				abuild-keygen -n \
+				&& mv /root/.abuild/*.rsa /root/.abuild/alpine-devel@danmolik.com.rsa \
+				&& mv /root/.abuild/*.rsa.pub /root/.abuild/alpine-devel@danmolik.com.rsa.pub ; \
+			fi \
+			&& echo "PACKAGER_PRIVKEY=\"/root/.abuild/alpine-devel@danmolik.com.rsa\"" > /root/.abuild/abuild.conf \
+			&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \
+			&& cd /build \
+			&& abuild -FRrk fetch \
+			&& abuild -FRrk checksum \
+			&& abuild -FRrk \
+			&& abuild -F clean \
+			&& abuild -FRrk cleanoldpkg \
+			&& apk index -o /root/packages/x86_64/APKINDEX.unsigned.tar.gz /root/packages/x86_64/*.apk \
+			&& cp /root/packages/x86_64/APKINDEX.unsigned.tar.gz /root/packages/x86_64/APKINDEX.tar.gz \
+			&& abuild-sign -k /root/.abuild/*.rsa /root/packages/x86_64/APKINDEX.tar.gz \
+			&& cp /root/.abuild/*.rsa* /root/packages/ ' ;
+	fi
+
+

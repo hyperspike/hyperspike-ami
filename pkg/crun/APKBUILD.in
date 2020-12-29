@@ -6,10 +6,16 @@ pkgdesc="crun is a container runner written in C"
 url="https://github.com/containers/crun"
 arch="x86_64"
 license="Apache-2.0"
-source="$pkgname-$pkgver.tar.gz"
+source="https://github.com/containers/$pkgname/releases/download/$pkgver/$pkgname-$pkgver.tar.gz"
 
 build() {
-	echo "skip"
+	cd $srcdir/$pkgname-$pkgver
+	./configure --prefix=/usr --disable-systemd --enable-bpf CFLAGS="-O2 -Wall -g -pipe"
+	cd libocispec
+	make V=1
+	# make V=1 DESTDIR=$pkgdir install-exec
+	cd ..
+	make V=1 crun
 }
 
 check() {
@@ -17,7 +23,11 @@ check() {
 }
 
 package() {
-	cd "$srcdir"
-	install -Dm755 usr/bin/crun "$pkgdir"/usr/bin/crun
+	cd "$srcdir"/$pkgname-$pkgver
+	cd libocispec
+	make V=1 DESTDIR=$pkgdir install-exec
+	cd ..
+	make V=1 DESTDIR=$pkgdir install-exec
+	# install -Dm755 usr/bin/crun "$pkgdir"/usr/bin/crun
 }
 

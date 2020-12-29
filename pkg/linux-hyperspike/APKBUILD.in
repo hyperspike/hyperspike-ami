@@ -1,4 +1,4 @@
-# Maintainer: Natanael Copa <ncopa@alpinelinux.org>
+# Maintainer: Dan Molik <dan@hyperspike.io>
 
 pkgname=linux-hyperspike
 pkgver=@LINUX_VERSION@

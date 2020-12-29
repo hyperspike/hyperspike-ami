@@ -6,10 +6,11 @@ pkgdesc="A CLI to create Hyperspike Clusters from Scratch"
 url="https://github.com/hyperspike/hyperctl"
 arch="x86_64"
 license="MIT"
-source="$pkgname"
+source="$pkgname-$pkgver.tar.gz::https://github.com/hyperspike/$pkgname/archive/master.tar.gz"
 
 build() {
-	echo "skip"
+	cd $srcdir/"$pkgname"-master
+	go build -v -ldflags="-X hyperspike.io/hyperctl.Version=$pkgver" -o $pkgname ./cmd/
 }
 
 check() {
@@ -17,5 +18,5 @@ check() {
 }
 
 package() {
-	install -Dm755 "$pkgname" "$pkgdir"/usr/bin/"$pkgname"
+	install -Dm755 $srcdir/"$pkgname"-master/$pkgname $pkgdir/usr/bin/$pkgname
 }

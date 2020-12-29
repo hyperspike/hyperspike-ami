@@ -6,12 +6,12 @@ pkgdesc="cri-o"
 url="https://github.com/cri-o/cri-o"
 arch="x86_64"
 license="Apache-2.0"
-source="$pkgname-$pkgver.tar.gz
+source="$pkgname-$pkgver.tar.gz::https://github.com/$pkgname/$pkgname/archive/v$pkgver.tar.gz
 cri-o.initd"
 
 build() {
-	echo "skip"
-
+	cd $srcdir/$pkgname-$pkgver
+	make V=1 -j4
 }
 
 check() {
@@ -19,15 +19,16 @@ check() {
 }
 
 package() {
-	install -Dm755 cri-o.initd                "$pkgdir"/etc/init.d/crio
-	cd "$srcdir"
-	install -Dm644 etc/crictl.yaml            "$pkgdir"/etc/crictl.yaml
-	install -Dm644 etc/crio/crio.conf         "$pkgdir"/etc/crio/crio.conf
-	install -Dm755 usr/bin/crio               "$pkgdir"/usr/bin/crio
-	install -Dm755 usr/bin/pinns              "$pkgdir"/usr/bin/pinns
-	install -Dm755 usr/bin/crio-status        "$pkgdir"/usr/bin/crio-status
+	install -Dm755 $srcdir/cri-o.initd $pkgdir/etc/init.d/crio
+	cd $srcdir/$pkgname-$pkgver
+	make V=1 DESTDIR=$pkgdir PREFIX=$pkgdir/usr install install.config
+	rm -rf $pkgdir/usr/share/man/
+	#install -Dm644 etc/crictl.yaml            "$pkgdir"/etc/crictl.yaml
+	#install -Dm644 etc/crio/crio.conf         "$pkgdir"/etc/crio/crio.conf
+	#install -Dm755 usr/bin/crio               "$pkgdir"/usr/bin/crio
+	#install -Dm755 usr/bin/pinns              "$pkgdir"/usr/bin/pinns
+	#install -Dm755 usr/bin/crio-status        "$pkgdir"/usr/bin/crio-status
 	# install -Dm755 usr/libexec/crio/pause     "$pkgdir"/usr/libexec/crio/pause
-	install -Ddm755 "$pkgdir"/usr/share/containers/oci/hooks.d/
-	install -Dm644 usr/share/oci-umount/oci-umount.d/crio-umount.conf "$pkgdir"/usr/share/oci-umount/oci-umount.d/crio-umount.conf
+	# install -Ddm755 "$pkgdir"/usr/share/containers/oci/hooks.d/
+	#install -Dm644 usr/share/oci-umount/oci-umount.d/crio-umount.conf "$pkgdir"/usr/share/oci-umount/oci-umount.d/crio-umount.conf
 }
-

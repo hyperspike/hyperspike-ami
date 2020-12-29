@@ -1,0 +1,13 @@
+FROM alpine:3.12.3
+
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
+	&& echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+	&& apk update \
+	&& apk upgrade \
+	&& apk add go gcc make rsync alpine-sdk binutils bash linux-headers libseccomp-dev \
+		glib-dev gpgme-dev libassuan-dev tzdata yajl-dev libtool automake autoconf \
+		libcap-dev python3 argp-standalone \
+	&& addgroup root abuild \
+	&& chgrp abuild /var/cache/distfiles \
+	&& chmod g+w /var/cache/distfiles
+

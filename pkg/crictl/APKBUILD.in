@@ -6,11 +6,11 @@ pkgdesc="CLI and validation tools for Kubelet Container Runtime Interface"
 url="https://github.com/kubernetes-sigs/cri-tools"
 arch="x86_64"
 license="Apache-2.0"
-source="$pkgname"
+source="$pkgname-$pkgver.tar.gz::https://github.com/kubernetes-sigs/cri-tools/archive/v$pkgver.tar.gz"
 
 build() {
-	echo "skip"
-
+	cd $srcdir/cri-tools-$pkgver
+	go build -mod=vendor -v -ldflags="-X github.com/kubernetes-sigs/cri-tools/pkg/version.Version=$pkgver" -o bin/$pkgname ./cmd/$pkgname
 }
 
 check() {
@@ -18,6 +18,6 @@ check() {
 }
 
 package() {
-	install -Dm755 $pkgname "$pkgdir"/usr/bin/"$pkgname"
+	install -Dm755 $srcdir/cri-tools-$pkgver/bin/$pkgname "$pkgdir"/usr/bin/"$pkgname"
 }
 

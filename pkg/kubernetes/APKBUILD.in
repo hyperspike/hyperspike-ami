@@ -1,0 +1,45 @@
+# Maintainer: Dan Molik <dan@danmolik.com>
+pkgname=kubernetes
+pkgver=@K8S_VERSION@
+pkgrel=0
+pkgdesc="Kubernetes - the computing paradigm shift"
+url="https://kubernetes.io/docs/reference/setup-tools/kubeadm/kubeadm/"
+arch="x86_64"
+license="Apache-2.0"
+source="$pkgname-$pkgver.tar.gz::https://github.com/$pkgname/$pkgname/archive/v$pkgver.tar.gz
+kubelet.conf
+kubelet.initd
+"
+
+subpackages="kubelet kubeadm kubectl"
+
+build() {
+	cd $srcdir/$pkgname-$pkgver
+	LDFLAGS="" make WHAT="cmd/kubelet cmd/kubectl cmd/kubeadm" V=1 GOFLAGS=-v -j4
+}
+
+check() {
+	echo "skip"
+}
+
+package() {
+	echo "meta package"
+	install -d -Dm755 $pkgdir/usr/share/kubernetes
+}
+
+kubelet() {
+	pkgdesc="The Kubernetes 'node agent'"
+	install -Dm755 $srcdir/$pkgname-$pkgver/_output/bin/$subpkgname $subpkgdir/usr/bin/$subpkgname
+	install -D -m755 $srcdir/"$subpkgname".initd "$subpkgdir"/etc/init.d/"$subpkgname"
+	install -D -m644 $srcdir/"$subpkgname".confd "$subpkgdir"/etc/conf.d/"$subpkgname"
+}
+
+kubeadm() {
+	pkgdesc="The Kubernetes 'deployment utility'"
+	install -Dm755 $srcdir/$pkgname-$pkgver/_output/bin/$subpkgname $subpkgdir/usr/bin/$subpkgname
+}
+
+kubectl() {
+	pkgdesc="The Kubernetes 'command line utility'"
+	install -Dm755 $srcdir/$pkgname-$pkgver/_output/bin/$subpkgname $subpkgdir/usr/bin/$subpkgname
+}

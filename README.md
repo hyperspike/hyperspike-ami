@@ -1,4 +1,6 @@
-# Hyperspike Builder
+# Hyperspike AMI Builder
+
+[![Build Status](https://ci.hyperspike.io/api/badges/Hyperspike/ami/status.svg)](https://ci.hyperspike.io/Hyperspike/ami)
 
 This repo is here to facilitate the creation of Hyperspike nodes. You'll find the Kubernetes node binaries (kubelet, kubeadm, and kubectl) along with a container stack (crun, cri-o).
 

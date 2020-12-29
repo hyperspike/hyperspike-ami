@@ -2,8 +2,8 @@
 
 sudo su -c 'echo http://dl-cdn.alpinelinux.org/alpine/edge/main/ >> /etc/apk/repositories'
 sudo su -c 'echo http://dl-cdn.alpinelinux.org/alpine/edge/community/ >> /etc/apk/repositories'
-sudo su -c 'echo @hyperspike https://danmolik.com/alpine/ >> /etc/apk/repositories'
-sudo su -c 'wget https://danmolik.com/alpine/alpine-devel@danmolik.com.rsa.pub -P /etc/apk/keys'
+sudo su -c 'echo @hyperspike https://alpine.hyperspike.io/ >> /etc/apk/repositories'
+sudo su -c 'wget https://alpine.hyperspike.io/alpine-devel@danmolik.com.rsa.pub -P /etc/apk/keys'
 sudo modprobe overlay
 sudo modprobe ext4
 sudo modprobe ip_tables

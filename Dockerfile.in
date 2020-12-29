@@ -31,6 +31,7 @@ FROM alpine-builder AS cri-o
 RUN cd $GOPATH \
 	&& mkdir -p src/github.com/cri-o/cri-o \
 	&& cd src/github.com/cri-o/cri-o \
+	&& apk add tzdata \
 	&& curl -L https://github.com/cri-o/cri-o/archive/v@CRIO_VERSION@.tar.gz | tar xz --strip-components=1 -C . \
 	&& make \
 	&& make DESTDIR=/root/cri-o PREFIX=/root/cri-o/usr install install.config \
