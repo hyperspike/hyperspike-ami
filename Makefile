@@ -102,11 +102,14 @@ repo/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]
 		fi \
 		&& echo "PACKAGER_PRIVKEY=\"/root/.abuild/alpine-devel@danmolik.com.rsa\"" > /root/.abuild/abuild.conf \
 		&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \
-		&& abuild -FRrk fetch \
-		&& abuild -FRrk checksum \
-		&& abuild -FRrk \
-		&& abuild -F clean \
-		&& abuild -FRrk cleanoldpkg \
+		&& export P=$$PWD \
+		&& cd $(shell echo $< | sed -e 's/\/APKBUILD//' ) \
+		&& abuild -FRrk -P $$P/repo fetch \
+		&& abuild -FRrk -P $$P/repo checksum \
+		&& abuild -FRrk -P $$P/repo \
+		&& abuild -F -P $$P/repo clean \
+		&& abuild -FRrk -P $$P/repo cleanoldpkg \
+		&& cd $$P \
 		&& apk index -o repo/x86_64/APKINDEX.unsigned.tar.gz repo/x86_64/*.apk \
 		&& cp repo/x86_64/APKINDEX.unsigned.tar.gz repo/x86_64/APKINDEX.tar.gz \
 		&& abuild-sign -k /root/.abuild/*.rsa repo/x86_64/APKINDEX.tar.gz ; \
