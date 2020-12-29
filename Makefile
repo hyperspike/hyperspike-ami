@@ -71,13 +71,15 @@ clean:
 real-clean: clean
 	rm -rf repo
 
-.PHONY: utils apk-builder apk-fetcher
-utils: apk-builder apk-fetcher
+.PHONY: utils apk-builder apk-fetcher apk-packer
+utils: apk-builder apk-fetcher apk-packer
 
 apk-builder:
 	docker build -f utils/Dockerfile.apk-builder -t graytshirt/alpine-builder ./utils
 apk-fetcher:
 	docker build -f utils/Dockerfile.apk-fetcher -t graytshirt/alpine-fetcher ./utils
+apk-packer:
+	docker build -f utils/Dockerfile.packer      -t graytshirt/packer          ./utils
 
 .PHONY: upload download
 upload:

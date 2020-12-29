@@ -1,0 +1,11 @@
+FROM alpine:3.12.3
+
+RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
+	&& echo "http://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
+	&& apk update \
+	&& apk upgrade \
+	&& apk add curl \
+	&& curl -OL https://releases.hashicorp.com/packer/1.6.6/packer_1.6.6_linux_amd64.zip \
+	&& unzip packer*.zip \
+	&& mv packer /usr/bin \
+	&& rm packer*.zip
