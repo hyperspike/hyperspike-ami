@@ -15,7 +15,7 @@ steps:
     MINIO_SECRET_KEY:
       from_secret: minio_secret_key
   commands:
-  - export MC_HOST_minio=https://$MINIO_ACCESS_KEY:$MINIO_SECRET_KEY@10.12.4.114:9000
+  - export "MC_HOST_minio=https://$MINIO_ACCESS_KEY:$MINIO_SECRET_KEY@titan01.iag.d3fy.net:9000"
   - make download
 - name: build-pkgs
   image: graytshirt/alpine-builder
@@ -36,7 +36,7 @@ steps:
     APK_KEY_PUB:
       from_secret: apk_key_pub
   commands:
-  - export MC_HOST_minio=https://$MINIO_ACCESS_KEY:$MINIO_SECRET_KEY@10.12.4.114:9000
+  - export "MC_HOST_minio=https://$MINIO_ACCESS_KEY:$MINIO_SECRET_KEY@titan01.iag.d3fy.net:9000"
   - make upload
 - name: build-ami
   image: graytshirt/packer
@@ -50,6 +50,6 @@ steps:
   - make ami
 ---
 kind: signature
-hmac: 569455b039352af019a3779af147c1e06080aea3d23be0914f14626c39b72ea8
+hmac: b0d7976f88621e60ee266980462a0f6d0faa4709c171e3bea32ef842130b0076
 
 ...
