@@ -5,6 +5,9 @@ RUN echo "http://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositori
 	&& apk update \
 	&& apk upgrade \
 	&& apk add make curl \
+	&& curl -OL https://alpine.hyperspike.io/d3fy-dot-net.crt \
+	&& cp d3fy-dot-net.crt /etc/ssl/certs \
+	&& cat d3fy-dot-net.crt >> /etc/ssl/certs/ca-certificates.crt \
 	&& curl -OL https://dl.min.io/client/mc/release/linux-amd64/mc \
 	&& chmod +x mc \
 	&& mv mc /usr/bin
