@@ -111,8 +111,7 @@ repo/pkg/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[
 		&& abuild -F -P ${PWD}/../../repo clean \
 		&& abuild -FRrk -P ${PWD}/../../repo cleanoldpkg \
 		&& cd ../../ \
-		&& apk index -o repo/pkg/x86_64/APKINDEX.unsigned.tar.gz repo/pkg/x86_64/*.apk \
-		&& cp repo/pkg/x86_64/APKINDEX.unsigned.tar.gz repo/pkg/x86_64/APKINDEX.tar.gz \
+		&& apk index -o repo/pkg/x86_64/APKINDEX.tar.gz repo/pkg/x86_64/*.apk \
 		&& abuild-sign -k /root/.abuild/*.rsa repo/pkg/x86_64/APKINDEX.tar.gz ; \
 	else \
 		docker run -it \
