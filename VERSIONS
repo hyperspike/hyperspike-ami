@@ -6,6 +6,6 @@ CRICTL     = 1.20.0
 LINUX      = 5.10.7
 ALPINE     = 3.12.3
 GO         = 1.14.13
-CILIUM     = 1.8.5
+CILIUM     = 1.8.6
 
-HYPERSPIKE = 0.3.36
+HYPERSPIKE = 0.3.37
