@@ -91,6 +91,7 @@ download:
 .SECONDEXPANSION:
 repo/pkg/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}//')/APKBUILD
 	@echo Building $(shell echo $(notdir $(@:-r0.apk='')) | sed -e 's/-[0-9]\+\.[0-9]\+\(\.[0-9]\+\)\{0,1\}$$//')
+	@# because it's a single shell command PWD get pre-evaluated before the cd command is executed
 	@if [ "$(DISTRO)" = "alpine" ] ; then \
 		if [ -z $(APK_KEY) ] || [ -z $(APK_KEY_PUB) ] ; then \
 			abuild-keygen -n \
@@ -105,11 +106,11 @@ repo/pkg/x86_64/%-r0.apk: pkg/$$(shell echo $$*|sed -e 's/-[0-9]\+\.[0-9]\+\(\.[
 		&& echo "PACKAGER_PRIVKEY=\"/root/.abuild/alpine-devel@danmolik.com.rsa\"" > /root/.abuild/abuild.conf \
 		&& cp /root/.abuild/alpine-devel@danmolik.com.rsa.pub /etc/apk/keys \
 		&& cd $(shell echo $< | sed -e 's/\/APKBUILD//' ) \
-		&& abuild -FRrk -P ${PWD}/../../repo fetch \
-		&& abuild -FRrk -P ${PWD}/../../repo checksum \
-		&& abuild -FRrk -P ${PWD}/../../repo \
-		&& abuild -F -P ${PWD}/../../repo clean \
-		&& abuild -FRrk -P ${PWD}/../../repo cleanoldpkg \
+		&& abuild -FRrk -P ${PWD}/repo fetch \
+		&& abuild -FRrk -P ${PWD}/repo checksum \
+		&& abuild -FRrk -P ${PWD}/repo \
+		&& abuild -F -P ${PWD}/repo clean \
+		&& abuild -FRrk -P ${PWD}/repo cleanoldpkg \
 		&& cd ../../ \
 		&& apk index -o repo/pkg/x86_64/APKINDEX.tar.gz repo/pkg/x86_64/*.apk \
 		&& abuild-sign -k /root/.abuild/*.rsa repo/pkg/x86_64/APKINDEX.tar.gz ; \
