@@ -55,6 +55,7 @@ sudo su -c 'echo "net.ipv4.neigh.default.gc_thresh3=16384" >> /etc/sysctl.conf'
 
 sudo su -c 'echo -e "ipost-up ip link set dev eth0 mtu 9000" >> /etc/network/interfaces'
 
+sudo sed -i -e 's/\(ip\ -[46]\ route add\ default.*\)/#\1/' /etc/udhcpc/post-bound/eth-eni-hook
 sudo mkdir -p /etc/cni/net.d
 sudo mkdir -p /opt/cni/bin
 sudo su -c 'echo "runtime-endpoint: unix:///run/crio/crio.sock" >> /etc/crictl.yaml'
