@@ -3,9 +3,9 @@ CONMON     = 2.0.24
 CRUN       = 0.16
 CRIO       = 1.20.0
 CRICTL     = 1.20.0
-LINUX      = 5.10.8
+LINUX      = 5.10.9
 ALPINE     = 3.12.3
 GO         = 1.14.13
 CILIUM     = 1.8.6
 
-HYPERSPIKE = 0.3.48
+HYPERSPIKE = 0.3.49
